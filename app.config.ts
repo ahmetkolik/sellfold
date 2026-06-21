@@ -18,14 +18,14 @@ export interface AppConfig {
 }
 
 export const appConfig: AppConfig = {
-  name: "Sellfold",
+  name: "Dropcart",
   tagline: { tr: "Dijital ürününü sat, anında teslim et.", en: "Sell your digital product, deliver instantly." },
   description: {
-    tr: "Sellfold, içerik üreticileri için dijital ürün dükkânı: e-kitap, şablon, preset ve kursunu yükle, ödeme al, dosyayı saniyeler içinde otomatik teslim et.",
-    en: "Sellfold is a digital storefront for creators: upload your ebooks, templates, presets and courses, take payment, and auto-deliver the files in seconds.",
+    tr: "Dropcart, içerik üreticileri için dijital ürün dükkânı: e-kitap, şablon, preset ve kursunu yükle, ödeme al, dosyayı saniyeler içinde otomatik teslim et.",
+    en: "Dropcart is a digital storefront for creators: upload your ebooks, templates, presets and courses, take payment, and auto-deliver the files in seconds.",
   },
-  domain: "sellfold.com",
-  logoText: "Vi",
+  domain: "dropcart.digital",
+  logoText: "DC",
   accentName: "coral",
 
   marketing: {
@@ -33,8 +33,8 @@ export const appConfig: AppConfig = {
     heroTitle: { tr: "Bilgini ürüne çevir.", en: "Turn your know-how into a product." },
     heroAccent: { tr: "Uyurken bile satsın.", en: "Let it sell while you sleep." },
     heroSubtitle: {
-      tr: "Sellfold, e-kitabını, şablonunu, presetini ve kursunu satışa açar. Güzel bir ürün sayfası, kart ödemesi ve anında otomatik teslimat — tek panelde. Komisyon avı yok, stok yok.",
-      en: "Sellfold puts your ebook, template, preset and course on sale. A beautiful product page, card payment and instant auto-delivery — in one panel. No commission hunting, no inventory.",
+      tr: "Dropcart, e-kitabını, şablonunu, presetini ve kursunu satışa açar. Güzel bir ürün sayfası, kart ödemesi ve anında otomatik teslimat — tek panelde. Komisyon avı yok, stok yok.",
+      en: "Dropcart puts your ebook, template, preset and course on sale. A beautiful product page, card payment and instant auto-delivery — in one panel. No commission hunting, no inventory.",
     },
     heroCtaPrimary: { tr: "Dükkânı aç", en: "Open your store" },
     heroCtaSecondary: { tr: "Nasıl göründüğüne bak", en: "See what it looks like" },
@@ -58,7 +58,7 @@ export const appConfig: AppConfig = {
       { name: "Stüdyo", price: "₺899", period: "/ay", tagline: { tr: "Ekip ve marka için tam dükkân.", en: "The full store for a team & brand." }, features: [{ tr: "Üretici'deki her şey", en: "Everything in Üretici" }, { tr: "Ekip & roller", en: "Team & roles" }, { tr: "Abonelik ürünleri", en: "Subscription products" }, { tr: "API & webhook", en: "API & webhooks" }], cta: { tr: "Ekip kur", en: "Set up a team" } },
     ],
     faq: [
-      { q: { tr: "Denemek için anahtar gerekli mi?", en: "Do I need API keys to try it?" }, a: { tr: "Hayır. Sellfold örnek ürünler, satışlar ve müşterilerle demo modda açılır — hemen tıklayabilirsin. Canlı satış için Stripe ve Resend anahtarını /setup ile bağlarsın.", en: "No. Sellfold boots in demo mode with sample products, sales and customers — click around immediately. Wire your Stripe and Resend keys via /setup to sell live." } },
+      { q: { tr: "Denemek için anahtar gerekli mi?", en: "Do I need API keys to try it?" }, a: { tr: "Hayır. Dropcart örnek ürünler, satışlar ve müşterilerle demo modda açılır — hemen tıklayabilirsin. Canlı satış için Stripe ve Resend anahtarını /setup ile bağlarsın.", en: "No. Dropcart boots in demo mode with sample products, sales and customers — click around immediately. Wire your Stripe and Resend keys via /setup to sell live." } },
       { q: { tr: "Hangi ürünleri satabilirim?", en: "What can I sell?" }, a: { tr: "Dijital her şey: e-kitap, Notion/figma şablonu, Lightroom preset'i, video kursu, ses paketi — tek dosya ya da link.", en: "Anything digital: ebooks, Notion/Figma templates, Lightroom presets, video courses, audio packs — a single file or a link." } },
       { q: { tr: "Teslimat nasıl çalışıyor?", en: "How does delivery work?" }, a: { tr: "Ödeme onaylanır onaylanmaz alıcıya markalı bir e-posta gider; indirme linki güvenli ve süreli olabilir. Hiçbir şeyi elle göndermen gerekmez.", en: "The moment payment clears, the buyer gets a branded email with a secure, optionally time-limited download link. You never send anything by hand." } },
       { q: { tr: "Para bana nasıl ulaşıyor?", en: "How do I get paid?" }, a: { tr: "Ödemeler Stripe hesabına doğrudan geçer; Sellfold araya girmez. Ödeme planları ve banka aktarımı Stripe panelinden yönetilir.", en: "Payments go straight to your Stripe account; Sellfold never holds your money. Payouts and bank transfers are managed from your Stripe dashboard." } },
