@@ -10,21 +10,42 @@ import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { LanguageToggle } from "@/components/ui/language-toggle";
+import { createClient } from "@/lib/supabase/client";
 
-/**
- * Login / signup with a DEMO BYPASS. Supabase isn't connected in this kit, so
- * submitting (or "Continue with demo") just drops you into the live demo
- * dashboard. Wire Supabase via /setup to make these forms do real auth.
- */
 export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
   const { ui, t, lang } = useLang();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [checkEmail, setCheckEmail] = useState(false);
 
-  function enter(e?: React.FormEvent) {
+  async function enter(e?: React.FormEvent) {
     e?.preventDefault();
+    setError(null);
     setLoading(true);
-    setTimeout(() => router.push("/dashboard"), 450);
+
+    const form = (e?.target as HTMLFormElement) ?? document.querySelector("form");
+    const email = (form?.querySelector("[name=email]") as HTMLInputElement)?.value ?? "";
+    const password = (form?.querySelector("[name=password]") as HTMLInputElement)?.value ?? "";
+    const fullName = (form?.querySelector("[name=name]") as HTMLInputElement)?.value ?? "";
+
+    const supabase = createClient();
+
+    if (mode === "signup") {
+      const { data, error: err } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      if (err) { setError(err.message); setLoading(false); return; }
+      if (data.user && !data.session) { setCheckEmail(true); setLoading(false); return; }
+    } else {
+      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      if (err) { setError(err.message); setLoading(false); return; }
+    }
+
+    router.push("/dashboard");
+    router.refresh();
   }
 
   const isLogin = mode === "login";
@@ -79,6 +100,24 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
             <Logo />
           </Link>
 
+          {checkEmail ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center">
+              <span className="text-5xl">📬</span>
+              <div>
+                <h2 className="font-display text-2xl font-semibold tracking-tight">
+                  {lang === "tr" ? "E-postanı doğrula" : "Check your email"}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {lang === "tr"
+                    ? "Kayıt tamamlandı! E-postana gelen doğrulama linkine tıklayarak hesabını aktif et."
+                    : "Registration complete! Click the confirmation link in your email to activate your account."}
+                </p>
+              </div>
+              <Link href="/login" className="text-sm font-medium text-primary hover:underline underline-offset-4">
+                {lang === "tr" ? "← Giriş sayfasına dön" : "← Back to login"}
+              </Link>
+            </div>
+          ) : (<>
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
               {appConfig.name}
@@ -113,29 +152,23 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
             )}
             <div className="space-y-1.5">
               <Label htmlFor="email">{ui.email}</Label>
-              <Input id="email" name="email" type="email" placeholder="you@company.com" defaultValue="demo@demo.app" />
+              <Input id="email" name="email" type="email" placeholder="you@company.com" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">{ui.password}</Label>
-              <Input id="password" name="password" type="password" placeholder="••••••••" defaultValue="demodemo" />
+              <Input id="password" name="password" type="password" placeholder="••••••••" />
             </div>
+            {error && (
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-center text-xs text-destructive">
+                {error}
+              </p>
+            )}
             <Button type="submit" disabled={loading} className="w-full gap-2">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {isLogin ? ui.signIn : ui.getStarted}
               {!loading && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
-
-          <button
-            onClick={enter}
-            className="w-full rounded-lg border border-dashed border-border py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary cursor-pointer"
-          >
-            {ui.continueDemo} →
-          </button>
-
-          <p className="rounded-lg bg-muted px-3 py-2 text-center text-xs text-muted-foreground">
-            {ui.demoNote}
-          </p>
 
           <p className="text-center text-sm text-muted-foreground">
             {isLogin ? ui.noAccount : ui.haveAccount}{" "}
@@ -146,6 +179,7 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
               {isLogin ? ui.getStarted : ui.signIn}
             </Link>
           </p>
+          </>)}
         </div>
       </section>
     </div>
