@@ -1,0 +1,6 @@
+node_modules
+.next
+.git
+videos
+setup-guide
+*.log
