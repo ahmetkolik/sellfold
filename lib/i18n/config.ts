@@ -10,7 +10,7 @@ export const LANGS = ["tr", "en"] as const;
 export type Lang = (typeof LANGS)[number];
 
 /** Default language shown on first load. Change to "en" to default to English. */
-export const DEFAULT_LANG: Lang = "tr";
+export const DEFAULT_LANG: Lang = "en";
 
 export const LANG_LABEL: Record<Lang, string> = { tr: "TR", en: "EN" };
 

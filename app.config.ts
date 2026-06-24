@@ -7,7 +7,7 @@ import type { L } from "@/lib/i18n/config";
 export type IconName = string;
 export interface NavItem { label: L; href: string; icon: IconName; }
 export interface Feature { icon: IconName; title: L; body: L; }
-export interface Stat { value: string; label: L; }
+export interface Stat { value: L; label: L; }
 export interface PricingTier { name: string; price: string; period?: string; tagline: L; features: L[]; cta: L; featured?: boolean; }
 export interface FaqItem { q: L; a: L; }
 export interface Integration { key: string; name: string; envVars: string[]; required: boolean; docsUrl: string; purpose: string; }
@@ -47,15 +47,15 @@ export const appConfig: AppConfig = {
       { icon: "ticket-percent", title: { tr: "Kupon & paket", en: "Coupons & bundles" }, body: { tr: "İndirim kodu üret, ürünleri paketle, lansman fiyatı koy. Satışı sen yönlendir.", en: "Spin up discount codes, bundle products, set launch pricing. You steer the sales." } },
     ],
     stats: [
-      { value: "%0", label: { tr: "satış komisyonu", en: "sales commission" } },
-      { value: "12 sn", label: { tr: "ortalama teslim süresi", en: "average delivery time" } },
-      { value: "4 tür", label: { tr: "e-kitap · şablon · preset · kurs", en: "ebook · template · preset · course" } },
-      { value: "0", label: { tr: "anahtarla dene", en: "keys to try it" } },
+      { value: { tr: "%0", en: "0%" }, label: { tr: "satış komisyonu", en: "sales commission" } },
+      { value: { tr: "12 sn", en: "12s" }, label: { tr: "ortalama teslim süresi", en: "average delivery time" } },
+      { value: { tr: "4 tür", en: "4 types" }, label: { tr: "e-kitap · şablon · preset · kurs", en: "ebook · template · preset · course" } },
+      { value: { tr: "0", en: "0" }, label: { tr: "anahtarla dene", en: "keys to try it" } },
     ],
     pricing: [
-      { name: "Başlangıç", price: "₺0", period: "/ay", tagline: { tr: "İlk ürününü satmaya başla.", en: "Start selling your first product." }, features: [{ tr: "3 ürün", en: "3 products" }, { tr: "Anında teslimat", en: "Instant delivery" }, { tr: "%5 işlem payı", en: "5% per-sale fee" }, { tr: "Müşteri defteri", en: "Customer ledger" }], cta: { tr: "Ücretsiz başla", en: "Start free" } },
-      { name: "Üretici", price: "₺349", period: "/ay", tagline: { tr: "Düzenli satan içerik üreticisi için.", en: "For the creator selling regularly." }, features: [{ tr: "Sınırsız ürün", en: "Unlimited products" }, { tr: "İşlem payı yok", en: "No per-sale fee" }, { tr: "Kupon & paket", en: "Coupons & bundles" }, { tr: "Markalı teslim e-postası", en: "Branded delivery email" }, { tr: "Özel alan adı", en: "Custom domain" }], cta: { tr: "30 gün ücretsiz dene", en: "Try free for 30 days" }, featured: true },
-      { name: "Stüdyo", price: "₺899", period: "/ay", tagline: { tr: "Ekip ve marka için tam dükkân.", en: "The full store for a team & brand." }, features: [{ tr: "Üretici'deki her şey", en: "Everything in Üretici" }, { tr: "Ekip & roller", en: "Team & roles" }, { tr: "Abonelik ürünleri", en: "Subscription products" }, { tr: "API & webhook", en: "API & webhooks" }], cta: { tr: "Ekip kur", en: "Set up a team" } },
+      { name: "Starter", price: "$0", period: "/mo", tagline: { tr: "İlk ürününü satmaya başla.", en: "Start selling your first product." }, features: [{ tr: "3 ürün", en: "3 products" }, { tr: "Anında teslimat", en: "Instant delivery" }, { tr: "%5 işlem payı", en: "5% per-sale fee" }, { tr: "Müşteri defteri", en: "Customer ledger" }], cta: { tr: "Ücretsiz başla", en: "Start free" } },
+      { name: "Creator", price: "$12", period: "/mo", tagline: { tr: "Düzenli satan içerik üreticisi için.", en: "For the creator selling regularly." }, features: [{ tr: "Sınırsız ürün", en: "Unlimited products" }, { tr: "İşlem payı yok", en: "No per-sale fee" }, { tr: "Kupon & paket", en: "Coupons & bundles" }, { tr: "Markalı teslim e-postası", en: "Branded delivery email" }, { tr: "Özel alan adı", en: "Custom domain" }], cta: { tr: "30 gün ücretsiz dene", en: "Try free for 30 days" }, featured: true },
+      { name: "Studio", price: "$29", period: "/mo", tagline: { tr: "Ekip ve marka için tam dükkân.", en: "The full store for a team & brand." }, features: [{ tr: "Creator'daki her şey", en: "Everything in Creator" }, { tr: "Ekip & roller", en: "Team & roles" }, { tr: "Abonelik ürünleri", en: "Subscription products" }, { tr: "API & webhook", en: "API & webhooks" }], cta: { tr: "Ekip kur", en: "Set up a team" } },
     ],
     faq: [
       { q: { tr: "Denemek için anahtar gerekli mi?", en: "Do I need API keys to try it?" }, a: { tr: "Hayır. Dropcart örnek ürünler, satışlar ve müşterilerle demo modda açılır — hemen tıklayabilirsin. Canlı satış için Stripe ve Resend anahtarını /setup ile bağlarsın.", en: "No. Dropcart boots in demo mode with sample products, sales and customers — click around immediately. Wire your Stripe and Resend keys via /setup to sell live." } },

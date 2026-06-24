@@ -16,8 +16,25 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
   const { ui, t, lang } = useLang();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [checkEmail, setCheckEmail] = useState(false);
+
+  async function signInWithOAuth(provider: "google" | "github") {
+    setOauthLoading(provider);
+    setError(null);
+    const supabase = createClient();
+    const { error: err } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (err) {
+      setError(err.message);
+      setOauthLoading(null);
+    }
+  }
 
   async function enter(e?: React.FormEvent) {
     e?.preventDefault();
@@ -76,8 +93,8 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
 
           <div className="mt-8 grid grid-cols-3 gap-3">
             {stats.map((s) => (
-              <div key={s.value} className="rounded-2xl bg-white/10 p-3 backdrop-blur-sm">
-                <p className="font-display text-2xl font-semibold tabular-nums">{s.value}</p>
+              <div key={t(s.label)} className="rounded-2xl bg-white/10 p-3 backdrop-blur-sm">
+                <p className="font-display text-2xl font-semibold tabular-nums">{t(s.value)}</p>
                 <p className="mt-0.5 text-[11px] text-white/75">{t(s.label)}</p>
               </div>
             ))}
@@ -127,13 +144,25 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
             </h2>
           </div>
 
-          {/* Social (decorative in demo) */}
+          {/* Social OAuth */}
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" onClick={enter} className="gap-2">
-              <GoogleGlyph /> Google
+            <Button
+              variant="outline"
+              onClick={() => signInWithOAuth("google")}
+              disabled={oauthLoading !== null}
+              className="gap-2"
+            >
+              {oauthLoading === "google" ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleGlyph />}
+              Google
             </Button>
-            <Button variant="outline" onClick={enter} className="gap-2">
-              <GithubGlyph /> GitHub
+            <Button
+              variant="outline"
+              onClick={() => signInWithOAuth("github")}
+              disabled={oauthLoading !== null}
+              className="gap-2"
+            >
+              {oauthLoading === "github" ? <Loader2 className="h-4 w-4 animate-spin" /> : <GithubGlyph />}
+              GitHub
             </Button>
           </div>
 

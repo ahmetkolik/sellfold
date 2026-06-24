@@ -6,18 +6,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Default currency for this kit. The setup can switch this per project. */
-export const CURRENCY = "TRY";
+export const CURRENCY = "USD";
 
 export function formatMoney(amount: number, currency: string = CURRENCY) {
-  return new Intl.NumberFormat("tr-TR", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
   }).format(amount);
 }
 
 export function formatNumber(n: number) {
-  return new Intl.NumberFormat("tr-TR").format(n);
+  return new Intl.NumberFormat("en-US").format(n);
 }
 
 export function formatPercent(n: number, digits = 1) {

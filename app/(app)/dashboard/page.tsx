@@ -309,7 +309,7 @@ export default function VitrinDashboard() {
           <div className="mt-6 flex h-44 items-end gap-3">
             {revMonths.map((r, i) => (
               <div key={r.m} className="flex flex-1 flex-col items-center gap-2">
-                <span className="text-[11px] font-medium tabular-nums text-muted-foreground">₺{r.v}K</span>
+                <span className="text-[11px] font-medium tabular-nums text-muted-foreground">${r.v}K</span>
                 <div className="flex w-full items-end justify-center" style={{ height: "100%" }}>
                   <div
                     className="w-full max-w-[44px] rounded-t-lg transition-all"

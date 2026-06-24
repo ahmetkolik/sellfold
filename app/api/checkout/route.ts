@@ -26,10 +26,10 @@ export async function POST(req: Request) {
     line_items: [
       {
         price_data: {
-          currency: "try",
+          currency: "usd",
           product_data: {
             name: product.title,
-            description: `${product.emoji} · Dijital ürün · Anında teslim`,
+            description: `${product.emoji} · Digital product · Instant delivery`,
           },
           unit_amount: Math.round(product.price * 100),
         },
