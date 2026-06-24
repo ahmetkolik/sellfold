@@ -3,12 +3,18 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+export const dynamic = "force-dynamic";
 
-const PLAN_BY_PRICE: Record<string, string> = {
-  [process.env.STRIPE_PRICE_CREATOR ?? ""]: "creator",
-  [process.env.STRIPE_PRICE_STUDIO ?? ""]: "studio",
-};
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+}
+
+function getPlanByPrice() {
+  return {
+    [process.env.STRIPE_PRICE_CREATOR ?? ""]: "creator",
+    [process.env.STRIPE_PRICE_STUDIO ?? ""]: "studio",
+  } as Record<string, string>;
+}
 
 function getSupabase() {
   return createClient(
@@ -25,6 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Webhook secret eksik" }, { status: 400 });
   }
 
+  const stripe = getStripe();
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
@@ -91,7 +98,7 @@ export async function POST(req: Request) {
   if (event.type === "customer.subscription.updated") {
     const sub = event.data.object as Stripe.Subscription;
     const priceId = sub.items.data[0]?.price.id ?? "";
-    const plan = PLAN_BY_PRICE[priceId] ?? "starter";
+    const plan = getPlanByPrice()[priceId] ?? "starter";
     const active = sub.status === "active" || sub.status === "trialing";
 
     const { data: profile } = await supabase
