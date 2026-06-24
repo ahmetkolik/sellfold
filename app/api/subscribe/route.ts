@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+export const dynamic = "force-dynamic";
+
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+}
 
 const PRICE_IDS: Record<string, string | undefined> = {
   creator: process.env.STRIPE_PRICE_CREATOR,
@@ -24,6 +28,7 @@ export async function POST(req: Request) {
     .eq("id", user.id)
     .single();
 
+  const stripe = getStripe();
   let customerId = profile?.stripe_customer_id as string | undefined;
   if (!customerId) {
     const customer = await stripe.customers.create({ email: user.email });
