@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
     const { data: product } = await supabase
       .from("products")
-      .select("user_id, name, file_url")
+      .select("user_id, title, file_url")
       .eq("id", productId)
       .single();
 
@@ -87,8 +87,8 @@ export async function POST(req: Request) {
         await resend.emails.send({
           from: "Dropcart <noreply@dropcart.digital>",
           to: buyerEmail,
-          subject: `Satın alımın hazır: ${product.name}`,
-          html: buildPurchaseEmail({ buyerName, productName: product.name, fileUrl: product.file_url, amount }),
+          subject: `Satın alımın hazır: ${product.title}`,
+          html: buildPurchaseEmail({ buyerName, productName: product.title, fileUrl: product.file_url, amount }),
         });
       }
     }
