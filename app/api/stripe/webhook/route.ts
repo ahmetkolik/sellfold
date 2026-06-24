@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const PLAN_BY_PRICE: Record<string, string> = {
   [process.env.STRIPE_PRICE_CREATOR ?? ""]: "creator",
@@ -77,6 +76,7 @@ export async function POST(req: Request) {
       });
 
       if (buyerEmail && process.env.RESEND_API_KEY) {
+        const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
           from: "Dropcart <noreply@dropcart.digital>",
           to: buyerEmail,
