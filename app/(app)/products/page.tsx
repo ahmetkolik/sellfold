@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  Plus, Wallet, BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Pencil, Loader2, X, ImagePlus, ArrowUpRight,
+  Plus, Wallet, BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Pencil, Loader2, X, ImagePlus, ArrowUpRight, FileUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -55,6 +55,7 @@ function ProductModal({
   const [error, setError] = useState<string | null>(null);
   const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
   const [categoryImagePreview, setCategoryImagePreview] = useState<string | null>(null);
+  const [digitalFile, setDigitalFile] = useState<File | null>(null);
   const [form, setForm] = useState({
     title: "",
     type: "ebook" as ProductType,
@@ -97,6 +98,18 @@ function ProductModal({
       categoryImageUrl = urlData.publicUrl;
     }
 
+    let fileUrl: string | null = null;
+    if (digitalFile) {
+      const ext = digitalFile.name.split(".").pop();
+      const path = `files/${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("product-files")
+        .upload(path, digitalFile, { upsert: true });
+      if (upErr) { setError(upErr.message); setLoading(false); return; }
+      const { data: urlData } = supabase.storage.from("product-files").getPublicUrl(path);
+      fileUrl = urlData.publicUrl;
+    }
+
     const { error: err } = await supabase.from("products").insert({
       user_id: user.id,
       title: form.title.trim(),
@@ -107,6 +120,7 @@ function ProductModal({
       live: form.live,
       category: form.category.trim() || null,
       category_image_url: categoryImageUrl,
+      file_url: fileUrl,
     });
 
     if (err) { setError(err.message); setLoading(false); return; }
@@ -215,6 +229,27 @@ function ProductModal({
                 </span>
               </label>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>{lang === "tr" ? "Dijital Dosya (PDF, ZIP…)" : "Digital File (PDF, ZIP…)"}</Label>
+            <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
+              <input
+                type="file"
+                accept=".pdf,.zip,.epub,.docx,.xlsx,.pptx,.mp4,.mp3,.png,.jpg,.jpeg,.gif,.svg,.ai,.psd,.figma"
+                className="hidden"
+                onChange={(e) => setDigitalFile(e.target.files?.[0] ?? null)}
+              />
+              <FileUp className="h-4 w-4 shrink-0" />
+              <span className="truncate">
+                {digitalFile ? digitalFile.name : (lang === "tr" ? "Dosya seç" : "Choose file")}
+              </span>
+              {digitalFile && (
+                <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
+                  {(digitalFile.size / 1024 / 1024).toFixed(1)} MB
+                </span>
+              )}
+            </label>
           </div>
 
           <label className="flex cursor-pointer items-center gap-3">
