@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 const SPEC = {
   brand: "Sellfold",
@@ -84,22 +84,35 @@ const SPEC = {
 };
 
 export default function MarketingPage() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Build the engine src purely as a string — no browser globals at module scope
-  const src =
-    typeof window !== "undefined"
-      ? `/engine.html#${encodeURIComponent(JSON.stringify(SPEC))}`
-      : "";
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const src = mounted
+    ? `/engine.html#${encodeURIComponent(JSON.stringify(SPEC))}`
+    : null;
 
   return (
-    <main style={{ height: "100dvh", width: "100%", overflow: "hidden", background: "#FBF7F2" }}>
+    <main
+      style={{
+        height: "100dvh",
+        width: "100%",
+        overflow: "hidden",
+        background: "#FBF7F2",
+      }}
+    >
       {src && (
         <iframe
-          ref={iframeRef}
           src={src}
           title="Sellfold"
-          style={{ height: "100%", width: "100%", border: "none", display: "block" }}
+          style={{
+            height: "100%",
+            width: "100%",
+            border: "none",
+            display: "block",
+          }}
         />
       )}
     </main>
