@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   const stripe = getStripe();
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET, 0);
   } catch {
     return NextResponse.json({ error: "Geçersiz imza" }, { status: 400 });
   }
