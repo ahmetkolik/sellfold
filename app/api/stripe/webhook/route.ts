@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
     const { data: product } = await supabase
       .from("products")
-      .select("user_id, title, file_url")
+      .select("user_id, title, file_url, file_url_en")
       .eq("id", productId)
       .single();
 
@@ -87,8 +87,14 @@ export async function POST(req: Request) {
         await resend.emails.send({
           from: "Dropcart <noreply@dropcart.digital>",
           to: buyerEmail,
-          subject: `Satın alımın hazır: ${product.title}`,
-          html: buildPurchaseEmail({ buyerName, productName: product.title, fileUrl: product.file_url, amount }),
+          subject: `Your purchase is ready: ${product.title}`,
+          html: buildPurchaseEmail({
+            buyerName,
+            productName: product.title,
+            fileUrlTr: product.file_url,
+            fileUrlEn: product.file_url_en,
+            amount,
+          }),
         });
       }
     }
@@ -135,22 +141,41 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-function buildPurchaseEmail({ buyerName, productName, fileUrl, amount }: {
+function buildPurchaseEmail({ buyerName, productName, fileUrlTr, fileUrlEn, amount }: {
   buyerName: string;
   productName: string;
-  fileUrl: string | null;
+  fileUrlTr: string | null;
+  fileUrlEn: string | null;
   amount: number;
 }) {
-  const downloadSection = fileUrl
-    ? `<p style="text-align:center;margin:32px 0">
-        <a href="${fileUrl}" style="background:#18181b;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">
-          Ürünü İndir
-        </a>
-       </p>`
-    : `<p style="color:#6b7280;font-size:14px">Ürün dosyası en kısa sürede e-posta ile iletilecektir.</p>`;
+  const hasFiles = fileUrlTr || fileUrlEn;
+
+  const downloadSection = hasFiles
+    ? `<div style="margin:32px 0">
+        <p style="text-align:center;margin:0 0 8px;font-size:13px;color:#6b7280">
+          Choose your preferred language / Dil seçin:
+        </p>
+        <table cellpadding="0" cellspacing="0" style="margin:0 auto">
+          <tr>
+            ${fileUrlEn ? `<td style="padding:0 6px">
+              <a href="${fileUrlEn}" style="display:inline-block;background:#18181b;color:#fff;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">
+                🇬🇧 Download in English
+              </a>
+            </td>` : ""}
+            ${fileUrlTr ? `<td style="padding:0 6px">
+              <a href="${fileUrlTr}" style="display:inline-block;background:#18181b;color:#fff;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">
+                🇹🇷 Türkçe İndir
+              </a>
+            </td>` : ""}
+          </tr>
+        </table>
+      </div>`
+    : `<p style="color:#6b7280;font-size:14px;text-align:center">
+        Your download link will be sent shortly. / İndirme linkiniz en kısa sürede iletilecektir.
+      </p>`;
 
   return `<!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 16px">
@@ -162,19 +187,20 @@ function buildPurchaseEmail({ buyerName, productName, fileUrl, amount }: {
         </td></tr>
         <!-- Body -->
         <tr><td style="padding:40px">
-          <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#18181b">Teşekkürler, ${buyerName}! 🎉</h1>
-          <p style="margin:0 0 24px;color:#6b7280;font-size:15px">Satın alımın başarıyla tamamlandı.</p>
+          <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#18181b">Thank you, ${buyerName}! 🎉</h1>
+          <p style="margin:0 0 4px;color:#6b7280;font-size:15px">Your purchase was successful.</p>
+          <p style="margin:0 0 24px;color:#6b7280;font-size:14px">Satın alımın başarıyla tamamlandı.</p>
 
           <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:24px">
-            <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;font-weight:600">ÜRÜN</p>
+            <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;font-weight:600">PRODUCT / ÜRÜN</p>
             <p style="margin:0;font-size:17px;font-weight:600;color:#18181b">${productName}</p>
-            <p style="margin:6px 0 0;font-size:14px;color:#6b7280">₺${amount.toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</p>
+            <p style="margin:6px 0 0;font-size:14px;color:#6b7280">$${amount.toFixed(2)}</p>
           </div>
 
           ${downloadSection}
 
           <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;text-align:center">
-            Herhangi bir sorun için <a href="mailto:info@dropcart.digital" style="color:#18181b">info@dropcart.digital</a> adresine yazabilirsin.
+            Questions? <a href="mailto:info@dropcart.digital" style="color:#18181b">info@dropcart.digital</a>
           </p>
         </td></tr>
         <!-- Footer -->
