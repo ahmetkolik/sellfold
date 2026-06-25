@@ -1,0 +1,319 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import {
+  ArrowLeft, ShoppingCart, Shield, Zap, RotateCcw, Check, Star,
+  BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Loader2,
+  Download, FileText, Video, Music, Key, Package,
+} from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { LogoMark } from "@/components/ui/logo";
+import { LanguageToggle } from "@/components/ui/language-toggle";
+import { useLang } from "@/components/i18n/language-provider";
+import appConfig from "@/app.config";
+import { formatMoney } from "@/lib/utils";
+
+type ProductType = "ebook" | "template" | "preset" | "course";
+
+interface Product {
+  id: string;
+  title: string;
+  type: ProductType;
+  price: number;
+  hue: string;
+  emoji: string;
+  live: boolean;
+  category: string | null;
+  category_image_url: string | null;
+}
+
+const typeIcon: Record<ProductType, typeof BookOpen> = {
+  ebook: BookOpen, template: LayoutTemplate, preset: SlidersHorizontal, course: GraduationCap,
+};
+
+const typeIncludes: Record<ProductType, { tr: string[]; en: string[] }> = {
+  ebook: {
+    tr: ["PDF dosyası (tam metin)", "EPUB formatı (e-okuyucu uyumlu)", "Yüksek çözünürlüklü görseller", "Yaşam boyu erişim"],
+    en: ["PDF file (full text)", "EPUB format (e-reader ready)", "High-resolution images", "Lifetime access"],
+  },
+  template: {
+    tr: ["Hazır şablon dosyası", "Kurulum rehberi PDF", "Demo içerik dahil", "Yaşam boyu erişim & güncellemeler"],
+    en: ["Ready-to-use template file", "Setup guide PDF", "Demo content included", "Lifetime access & updates"],
+  },
+  preset: {
+    tr: ["Tüm LUT / preset dosyaları", "DNG kurulum dosyası", "Uygulama kılavuzu PDF", "Yaşam boyu ücretsiz güncellemeler"],
+    en: ["All LUT / preset files", "DNG installation file", "Application guide PDF", "Lifetime free updates"],
+  },
+  course: {
+    tr: ["Tüm video dersler (MP4)", "Ders notları PDF", "Alıştırma dosyaları", "Soru-cevap desteği"],
+    en: ["All video lessons (MP4)", "Lesson notes PDF", "Exercise files", "Q&A support access"],
+  },
+};
+
+const typeInclIcon = [Download, FileText, Video, Key];
+
+export default function ProductPage() {
+  const { id } = useParams<{ id: string }>();
+  const { lang, t } = useLang();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [buying, setBuying] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    const supabase = createClient();
+    supabase
+      .from("products")
+      .select("id, title, type, price, hue, emoji, live, category, category_image_url")
+      .eq("id", id)
+      .eq("live", true)
+      .single()
+      .then(({ data }) => {
+        if (!data) { setNotFound(true); setLoading(false); return; }
+        setProduct(data as Product);
+        setLoading(false);
+        supabase
+          .from("products")
+          .select("id, title, type, price, hue, emoji, live, category, category_image_url")
+          .eq("live", true)
+          .neq("id", id)
+          .limit(3)
+          .then(({ data: rel }) => setRelated((rel ?? []) as Product[]));
+      });
+  }, [id]);
+
+  async function buy() {
+    if (!product) return;
+    setBuying(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+      const { url, error } = await res.json();
+      if (error || !url) { alert(lang === "tr" ? "Bir hata oluştu." : "An error occurred."); setBuying(false); return; }
+      window.location.href = url;
+    } catch {
+      setBuying(false);
+    }
+  }
+
+  const m = {
+    tr: {
+      back: "Mağazaya dön", buyNow: "Satın al — anında teslim", buying: "Yönlendiriliyor…",
+      includes: "Neler dahil?", trust1: "Güvenli ödeme", trust2: "Anında teslimat", trust3: "30 gün iade",
+      relatedTitle: "Öne çıkan ürünler", buy: "Satın al",
+      notFound: "Ürün bulunamadı", notFoundSub: "Bu ürün mevcut değil veya yayından kaldırılmış olabilir.",
+      loading: "Yükleniyor…",
+      reviewsLabel: "değerlendirme",
+    },
+    en: {
+      back: "Back to store", buyNow: "Buy now — instant delivery", buying: "Redirecting…",
+      includes: "What's included", trust1: "Secure checkout", trust2: "Instant delivery", trust3: "30-day refund",
+      relatedTitle: "More products", buy: "Buy",
+      notFound: "Product not found", notFoundSub: "This product may not exist or has been unpublished.",
+      loading: "Loading…",
+      reviewsLabel: "reviews",
+    },
+  }[lang];
+
+  if (loading) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin" />
+        <p className="text-sm">{m.loading}</p>
+      </div>
+    );
+  }
+
+  if (notFound || !product) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
+        <span className="text-5xl">📦</span>
+        <h1 className="font-display text-2xl font-semibold">{m.notFound}</h1>
+        <p className="text-sm text-muted-foreground">{m.notFoundSub}</p>
+        <Link href="/" className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">
+          <ArrowLeft className="h-4 w-4" /> {m.back}
+        </Link>
+      </div>
+    );
+  }
+
+  const TypeIcon = typeIcon[product.type] ?? BookOpen;
+  const includes = typeIncludes[product.type] ?? typeIncludes.ebook;
+
+  return (
+    <div className="min-h-dvh" style={{ background: "var(--color-background)" }}>
+      {/* Nav */}
+      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 lg:px-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" /> {m.back}
+          </Link>
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <LogoMark className="h-7 w-7" />
+            <span className="font-display text-base font-semibold tracking-tight">{appConfig.name}</span>
+          </Link>
+          <LanguageToggle />
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-start">
+
+          {/* Left: cover + preview thumbnails */}
+          <div className="space-y-4">
+            <div
+              className="grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl shadow-pop"
+              style={{ backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` }}
+            >
+              <span className="text-8xl drop-shadow-lg">{product.emoji}</span>
+            </div>
+            {/* Type + category badge */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium">
+                <TypeIcon className="h-3.5 w-3.5 text-primary" />
+                {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
+              </span>
+              {product.category && (
+                <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+                  {product.category}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right: buy card (sticky) */}
+          <div className="lg:sticky lg:top-24 space-y-5">
+            <div>
+              <h1 className="font-display text-[clamp(24px,3.5vw,36px)] font-bold leading-[1.1] tracking-tight">
+                {product.title}
+              </h1>
+
+              {/* Stars */}
+              <div className="mt-3 flex items-center gap-2">
+                <span className="flex">
+                  {[1,2,3,4,5].map((s) => (
+                    <Star key={s} className={`h-4 w-4 ${s <= 4 ? "fill-primary text-primary" : "fill-muted text-muted"}`} />
+                  ))}
+                </span>
+                <span className="text-sm font-medium">4.9</span>
+                <span className="text-sm text-muted-foreground">· 128 {m.reviewsLabel}</span>
+              </div>
+
+              {/* Price */}
+              <div className="mt-5 flex items-baseline gap-3">
+                <span className="font-display text-5xl font-bold tabular-nums text-primary">
+                  {formatMoney(product.price)}
+                </span>
+              </div>
+            </div>
+
+            {/* Buy button */}
+            <button
+              onClick={buy}
+              disabled={buying}
+              className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-4 text-[15px] font-semibold text-primary-foreground shadow-md shadow-primary/25 transition hover:opacity-90 disabled:opacity-70"
+            >
+              {buying
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> {m.buying}</>
+                : <><ShoppingCart className="h-4 w-4" /> {m.buyNow}</>
+              }
+            </button>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-around rounded-xl border border-border bg-card/60 py-3.5 px-2">
+              <span className="flex flex-col items-center gap-1 text-center text-xs text-muted-foreground">
+                <Shield className="h-4 w-4 text-success" />
+                {m.trust1}
+              </span>
+              <span className="h-8 w-px bg-border" />
+              <span className="flex flex-col items-center gap-1 text-center text-xs text-muted-foreground">
+                <Zap className="h-4 w-4 text-success" />
+                {m.trust2}
+              </span>
+              <span className="h-8 w-px bg-border" />
+              <span className="flex flex-col items-center gap-1 text-center text-xs text-muted-foreground">
+                <RotateCcw className="h-4 w-4 text-success" />
+                {m.trust3}
+              </span>
+            </div>
+
+            {/* What's included */}
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h2 className="font-semibold tracking-tight">{m.includes}</h2>
+              <ul className="mt-3.5 space-y-2.5">
+                {(lang === "tr" ? includes.tr : includes.en).map((item, i) => {
+                  const IncIcon = typeInclIcon[i % typeInclIcon.length];
+                  return (
+                    <li key={item} className="flex items-center gap-2.5 text-sm">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-success/10">
+                        <Check className="h-3.5 w-3.5 text-success" />
+                      </span>
+                      {item}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related products */}
+      {related.length > 0 && (
+        <section className="border-t border-border py-16">
+          <div className="mx-auto max-w-6xl px-5 lg:px-8">
+            <h2 className="mb-8 font-display text-2xl font-semibold tracking-tight">{m.relatedTitle}</h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((p) => {
+                const Icon = typeIcon[p.type] ?? BookOpen;
+                return (
+                  <Link key={p.id} href={`/p/${p.id}`}
+                    className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-pop">
+                    <div
+                      className="grid aspect-[16/9] place-items-center"
+                      style={{ backgroundImage: `linear-gradient(140deg, oklch(94% 0.06 ${p.hue}) 0%, oklch(86% 0.13 ${p.hue}) 100%)` }}
+                    >
+                      <span className="text-4xl drop-shadow-sm">{p.emoji}</span>
+                    </div>
+                    <div className="p-4">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                        <Icon className="h-3 w-3" /> {p.type}
+                      </span>
+                      <p className="mt-1 truncate font-semibold">{p.title}</p>
+                      <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                        <p className="font-display text-lg font-bold text-primary">{formatMoney(p.price)}</p>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                          <ShoppingCart className="h-3 w-3" /> {m.buy}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Footer */}
+      <footer className="border-t border-border py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-5 text-center text-sm text-muted-foreground lg:px-8">
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <LogoMark className="h-6 w-6" />
+            <span className="font-display text-sm font-semibold tracking-tight text-foreground">{appConfig.name}</span>
+          </Link>
+          <p className="text-[12px]">{appConfig.name} · {appConfig.domain} · © 2026</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
