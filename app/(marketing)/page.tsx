@@ -165,7 +165,7 @@ const SPECS: Record<"tr" | "en", object> = {
 
 export default function MarketingPage() {
   const [mounted, setMounted] = useState(false);
-  const [lang, setLang] = useState<"tr" | "en">("tr");
+  const [lang, setLang] = useState<"tr" | "en">("en");
 
   useEffect(() => {
     setMounted(true);

@@ -6,10 +6,10 @@ import Link from "next/link";
 import {
   ArrowLeft, ShoppingCart, Shield, Zap, RotateCcw, Check, Star,
   BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Loader2,
-  Download, FileText, Video, Music, Key, Package,
+  Download, FileText, Video, Key, Menu, X, LayoutDashboard,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { LogoMark } from "@/components/ui/logo";
+import { Logo } from "@/components/ui/logo";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useLang } from "@/components/i18n/language-provider";
 import appConfig from "@/app.config";
@@ -124,6 +124,8 @@ export default function ProductPage() {
   const [notFound, setNotFound] = useState(false);
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [claimSuccess, setClaimSuccess] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -132,6 +134,7 @@ export default function ProductPage() {
     // Check logged-in user plan
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
+      setIsLoggedIn(true);
       supabase.from("profiles").select("plan").eq("id", user.id).single()
         .then(({ data }) => setUserPlan(data?.plan ?? "starter"));
     });
@@ -272,17 +275,90 @@ export default function ProductPage() {
   return (
     <div className="min-h-dvh" style={{ background: "var(--color-background)" }}>
       {/* Nav */}
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 lg:px-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="h-4 w-4" /> {m.back}
+      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 lg:px-8">
+          {/* Logo */}
+          <Link href="/" className="shrink-0">
+            <Logo withWordmark />
           </Link>
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <LogoMark className="h-7 w-7" />
-            <span className="font-display text-base font-semibold tracking-tight">{appConfig.name}</span>
-          </Link>
-          <LanguageToggle />
+
+          {/* Desktop nav links */}
+          <nav className="hidden md:flex items-center gap-1">
+            <Link href="/" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              {lang === "tr" ? "Mağaza" : "Store"}
+            </Link>
+            <Link href="/#pricing" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              {lang === "tr" ? "Fiyatlar" : "Pricing"}
+            </Link>
+          </nav>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            <LanguageToggle className="hidden sm:flex" />
+            {isLoggedIn ? (
+              <Link href="/dashboard" className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-sidebar px-3 py-1.5 text-sm font-medium text-sidebar-foreground hover:opacity-90 transition-opacity">
+                <LayoutDashboard className="h-4 w-4" />
+                {lang === "tr" ? "Yönetim" : "Dashboard"}
+              </Link>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
+                <Link href="/login" className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                  {lang === "tr" ? "Giriş yap" : "Sign in"}
+                </Link>
+                <Link href="/signup" className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
+                  {lang === "tr" ? "Kayıt ol" : "Sign up"}
+                </Link>
+              </div>
+            )}
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden grid h-9 w-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-1">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+              <ShoppingCart className="h-4 w-4 text-primary" />
+              {lang === "tr" ? "Mağaza" : "Store"}
+            </Link>
+            <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+              <Star className="h-4 w-4 text-primary" />
+              {lang === "tr" ? "Fiyatlar" : "Pricing"}
+            </Link>
+            <div className="pt-2 border-t border-border mt-2 space-y-1">
+              {isLoggedIn ? (
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-lg bg-sidebar px-3 py-2.5 text-sm font-semibold text-sidebar-foreground">
+                  <LayoutDashboard className="h-4 w-4" />
+                  {lang === "tr" ? "Yönetim Paneli" : "Dashboard"}
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+                    {lang === "tr" ? "Giriş yap" : "Sign in"}
+                  </Link>
+                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
+                    {lang === "tr" ? "Ücretsiz kayıt ol" : "Sign up free"}
+                  </Link>
+                </>
+              )}
+              <div className="flex justify-center pt-1">
+                <LanguageToggle />
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
@@ -421,12 +497,16 @@ export default function ProductPage() {
 
       {/* Footer */}
       <footer className="border-t border-border py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-5 text-center text-sm text-muted-foreground lg:px-8">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <LogoMark className="h-6 w-6" />
-            <span className="font-display text-sm font-semibold tracking-tight text-foreground">{appConfig.name}</span>
-          </Link>
-          <p className="text-[12px]">{appConfig.name} · {appConfig.domain} · © 2026</p>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-5 text-center text-sm text-muted-foreground lg:px-8">
+          <Link href="/"><Logo /></Link>
+          <div className="flex items-center gap-4 text-xs">
+            <Link href="/" className="hover:text-foreground transition-colors">{lang === "tr" ? "Mağaza" : "Store"}</Link>
+            <span className="h-3 w-px bg-border" />
+            <Link href="/login" className="hover:text-foreground transition-colors">{lang === "tr" ? "Giriş yap" : "Sign in"}</Link>
+            <span className="h-3 w-px bg-border" />
+            <Link href="/signup" className="hover:text-foreground transition-colors">{lang === "tr" ? "Kayıt ol" : "Sign up"}</Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground/70">{appConfig.name} · {appConfig.domain} · © 2026</p>
         </div>
       </footer>
     </div>

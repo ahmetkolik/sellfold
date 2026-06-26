@@ -153,7 +153,7 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
               className="w-full gap-2"
             >
               {oauthLoading === "google" ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleGlyph />}
-              Google {lang === "tr" ? "ile devam et" : "ile devam et"}
+              {lang === "tr" ? "Google ile devam et" : "Continue with Google"}
             </Button>
           </div>
 
