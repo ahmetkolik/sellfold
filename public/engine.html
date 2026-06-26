@@ -24,6 +24,48 @@
     --text:"Space Grotesk",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
     --mono:"Space Mono","SF Mono",ui-monospace,Menlo,monospace;
   }
+  /* ===== LIGHT THEME ===== */
+  body.light{
+    --bg:#FBF7F2;
+    --ink:#2A1506;
+    --ink-mid:#7A5A3A;
+    --ink-dim:#B8926A;
+    --hair:rgba(0,0,0,.09);
+  }
+  body.light{ background:#FBF7F2 !important; }
+  html:has(body.light){ background:#FBF7F2 !important; }
+  body.light .bg .wash{ mix-blend-mode:multiply; }
+  body.light .bgimg{ mix-blend-mode:multiply; opacity:0 !important; }
+  body.light .vignette{ background:linear-gradient(180deg, rgba(251,247,242,.6) 0%, transparent 22%, transparent 78%, rgba(251,247,242,.7) 100%); }
+  body.light .grain{ opacity:.03; mix-blend-mode:multiply; }
+  body.light[data-mv="0"]{ --accent:#D96B4A; --wash1:rgba(217,107,74,.18); --wash2:rgba(200,96,58,.12) }
+  body.light[data-mv="1"]{ --accent:#C8603A; --wash1:rgba(200,96,58,.18); --wash2:rgba(168,67,48,.14) }
+  body.light[data-mv="2"]{ --accent:#B85530; --wash1:rgba(184,85,48,.16); --wash2:rgba(140,55,30,.12) }
+  body.light[data-mv="3"]{ --accent:#A84330; --wash1:rgba(168,67,48,.15); --wash2:rgba(120,40,20,.12) }
+  body.light .box::before{ background:radial-gradient(62% 62% at 50% 50%, rgba(251,247,242,.85), rgba(251,247,242,.5) 55%, transparent 78%); }
+  body.light .layer.center .box::before{ background:radial-gradient(58% 58% at 50% 50%, rgba(251,247,242,.95), rgba(251,247,242,.7) 50%, transparent 82%); }
+  body.light .hero .box::before{ background:radial-gradient(62% 62% at 50% 50%, rgba(251,247,242,.92), rgba(251,247,242,.6) 55%, transparent 78%); }
+  body.light .layer.left .box, body.light .layer.right .box{
+    background:rgba(255,252,248,.72);
+    border:1px solid rgba(0,0,0,.08);
+    box-shadow:0 20px 60px rgba(0,0,0,.10);
+  }
+  body.light .box.product{
+    background:rgba(255,252,248,.80);
+    border:1px solid rgba(0,0,0,.08);
+    box-shadow:0 30px 80px rgba(0,0,0,.12);
+  }
+  body.light .box.product .prod-img{ background:#F0EAE0; border-color:rgba(0,0,0,.06); }
+  body.light .box.product .thumb{ background:#F0EAE0; border-color:rgba(0,0,0,.10); }
+  body.light .box.product .notes span{ color:#7A5A3A; border-color:rgba(0,0,0,.14); }
+  body.light .box.product .btn.ghost{ border-color:rgba(0,0,0,.25); color:#5A3A1A; }
+  body.light .box.product .btn.ghost:hover{ background:rgba(0,0,0,.06); color:#2A1506; }
+  body.light .pcard{ background:rgba(255,252,248,.7); border-color:rgba(0,0,0,.08); }
+  body.light .pcard .ph{ background:#EDE7DC; }
+  body.light #site{ background:#F5F0EA; }
+  body.light #footer{ background:#EDE7DC; }
+  body.light .loader{ background:var(--bg); }
+  body.light .fallback{ background:var(--bg); }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:auto;font-optical-sizing:auto}
   html,body{
@@ -396,6 +438,8 @@
   <!-- ============ SITE CONFIG (build.py replaces the object between the markers) ============ -->
   <script>
     var _CDN = "https://dqv0cqkoy5oj7.cloudfront.net/user_39R9CilAvVTqeEzIQuhpa8M6aBf/";
+    // Apply theme + lang from SPEC before CONFIG is read
+    (function(){try{var _c=JSON.parse(decodeURIComponent(location.hash.slice(1)));if(_c.theme==="light")document.body.classList.add("light");if(_c.lang)document.documentElement.lang=_c.lang;}catch(e){}})();
     window.CONFIG = (function () { try { if (location.hash.length > 1) return JSON.parse(decodeURIComponent(location.hash.slice(1))); } catch (e) { } return /*__CONFIG_START__*/ {
       brand: "oúme", tagline: "starts where you look for inspiration",
       outro: "the energy to be yourself.", loaderSub: "composing the scent",
@@ -880,3 +924,5 @@
   </script>
 </body>
 </html>
+
+
