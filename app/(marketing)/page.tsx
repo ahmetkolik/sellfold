@@ -19,6 +19,8 @@ interface Product {
   id: string; title: string; type: ProductType;
   price: number; emoji: string; hue: string;
   category_image_url: string | null;
+  description: string | null;
+  description_en: string | null;
 }
 
 const featureIcons: Record<string, React.ElementType> = {
@@ -120,7 +122,7 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
-const HERO_3D_IMAGE = "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png";
+const HERO_3D_IMAGE = "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260626_122819_e445518d-2002-4bb3-a65d-a843960e722d.jpeg";
 
 function Hero() {
   const { t, lang } = useLang();
@@ -267,6 +269,11 @@ function Products({ products, lang }: { products: Product[]; lang: "tr" | "en" }
                     <Icon className="h-3 w-3" /> {p.type}
                   </span>
                   <p className="font-semibold text-sm truncate">{p.title}</p>
+                  {(lang === "tr" ? p.description : p.description_en) && (
+                    <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                      {lang === "tr" ? p.description : p.description_en}
+                    </p>
+                  )}
                   <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
                     <span className="text-xs text-muted-foreground">
                       {lang === "tr" ? "Starter ile ücretsiz" : "Free on Starter"}
@@ -417,7 +424,7 @@ export default function MarketingPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.from("products").select("id,title,type,price,emoji,hue,category_image_url").eq("live", true).limit(6)
+    supabase.from("products").select("id,title,type,price,emoji,hue,category_image_url,description,description_en").eq("live", true).limit(6)
       .then(({ data }) => setProducts((data ?? []) as Product[]));
     supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
   }, []);

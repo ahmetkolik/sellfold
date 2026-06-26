@@ -32,6 +32,10 @@ yarn-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Test screenshots (root level only)
+/hero-candidate-*.jpeg
+/chatgpt-promo-*.jpeg
+
 # Local Netlify folder
 .netlify
 

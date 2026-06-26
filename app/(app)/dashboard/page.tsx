@@ -12,8 +12,8 @@ import { useLang } from "@/components/i18n/language-provider";
 import {
   payouts as demoPayouts, revenue14d as demoRev14d, revenueMonths as demoRevMonths, activity as demoActivity, funnel as demoFunnel, balance as demoBalance,
 } from "@/lib/demo/data";
-import type { Product, Customer, ProductType } from "@/lib/demo/data";
-import { fetchProducts, fetchOrders, deriveCustomers, computeStats, computeRevenue14d, computeRevenueMonths, type Order } from "@/lib/supabase/data";
+import type { Customer, ProductType } from "@/lib/demo/data";
+import { fetchProducts, fetchOrders, deriveCustomers, computeStats, computeRevenue14d, computeRevenueMonths, type Order, type FullProduct } from "@/lib/supabase/data";
 import { formatMoney, formatNumber, formatRelative } from "@/lib/utils";
 
 const typeIcon: Record<ProductType, typeof BookOpen> = {
@@ -59,7 +59,7 @@ function Cover({ hue, emoji, className = "" }: { hue: string; emoji: string; cla
 export default function VitrinDashboard() {
   const { lang, t } = useLang();
 
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<FullProduct[]>([]);
   const [sales, setSales] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [rev14d, setRev14d] = useState(demoRev14d);
@@ -198,7 +198,10 @@ export default function VitrinDashboard() {
               return (
                 <div key={p.id} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-pop">
                   <div className="relative">
-                    <Cover hue={p.hue} emoji={p.emoji} className="aspect-[16/9] w-full" />
+                    {p.category_image_url
+                      ? <img src={p.category_image_url} alt={p.title} className="aspect-[16/9] w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      : <Cover hue={p.hue} emoji={p.emoji} className="aspect-[16/9] w-full" />
+                    }
                     <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur">
                       <Icon className="h-3 w-3" /> {t(typeLabel[p.type])}
                     </span>
@@ -208,13 +211,14 @@ export default function VitrinDashboard() {
                   </div>
                   <div className="p-4">
                     <p className="truncate font-medium">{p.title}</p>
+                    {(lang === "tr" ? p.description : p.description_en) && (
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {lang === "tr" ? p.description : p.description_en}
+                      </p>
+                    )}
                     <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                      <p className="font-display text-lg font-semibold tabular-nums text-primary">{formatMoney(p.price)}</p>
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />{formatMoney(p.revenue)} {lang === "tr" ? "toplam" : "lifetime"}</span>
                       <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground tabular-nums">{formatNumber(p.sales)}</span> {m.salesShort}</p>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />{formatMoney(p.revenue)}</span>
-                      <span className="text-muted-foreground/70">{lang === "tr" ? "toplam" : "lifetime"}</span>
                     </div>
                   </div>
                 </div>
