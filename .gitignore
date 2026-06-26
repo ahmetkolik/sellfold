@@ -37,3 +37,6 @@ next-env.d.ts
 
 # Playwright MCP session files
 .playwright-mcp/
+
+# Mobile test screenshots
+mobile-*.png
