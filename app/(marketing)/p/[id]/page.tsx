@@ -171,10 +171,13 @@ export default function ProductPage() {
           {/* Left: cover + preview thumbnails */}
           <div className="space-y-4">
             <div
-              className="grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-2xl shadow-pop"
-              style={{ backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` }}
+              className="aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-pop"
+              style={!product.category_image_url ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` } : undefined}
             >
-              <span className="text-8xl drop-shadow-lg">{product.emoji}</span>
+              {product.category_image_url
+                ? <img src={product.category_image_url} alt={product.title} className="h-full w-full object-cover" />
+                : <span className="flex h-full w-full items-center justify-center text-8xl drop-shadow-lg">{product.emoji}</span>
+              }
             </div>
             {/* Type + category badge */}
             <div className="flex flex-wrap items-center gap-2">
@@ -279,10 +282,13 @@ export default function ProductPage() {
                   <Link key={p.id} href={`/p/${p.id}`}
                     className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-pop">
                     <div
-                      className="grid aspect-[16/9] place-items-center"
-                      style={{ backgroundImage: `linear-gradient(140deg, oklch(94% 0.06 ${p.hue}) 0%, oklch(86% 0.13 ${p.hue}) 100%)` }}
+                      className="aspect-[16/9] overflow-hidden"
+                      style={!p.category_image_url ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.06 ${p.hue}) 0%, oklch(86% 0.13 ${p.hue}) 100%)` } : undefined}
                     >
-                      <span className="text-4xl drop-shadow-sm">{p.emoji}</span>
+                      {p.category_image_url
+                        ? <img src={p.category_image_url} alt={p.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                        : <span className="flex h-full w-full items-center justify-center text-4xl drop-shadow-sm">{p.emoji}</span>
+                      }
                     </div>
                     <div className="p-4">
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
