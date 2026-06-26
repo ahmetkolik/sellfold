@@ -530,13 +530,12 @@ export default function ProductsPage() {
                   <div className="p-4">
                     <p className="truncate font-medium">{p.title}</p>
                     <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                      <p className="font-display text-lg font-semibold tabular-nums text-primary">{formatMoney(p.price)}</p>
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />{formatMoney(p.revenue)} {lang === "tr" ? "gelir" : "revenue"}</span>
                       <p className="text-xs text-muted-foreground">
                         <span className="font-semibold text-foreground tabular-nums">{formatNumber(p.sales)}</span> {m.sales}
                       </p>
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />{formatMoney(p.revenue)}</span>
+                    <div className="mt-2 flex justify-end">
                       <Button
                         variant="ghost"
                         size="sm"
