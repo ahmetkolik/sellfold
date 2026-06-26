@@ -32,9 +32,41 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: `${appConfig.name} — ${appConfig.tagline[DEFAULT_LANG]}`,
+  title: {
+    default: `${appConfig.name} — ${appConfig.tagline[DEFAULT_LANG]}`,
+    template: `%s | ${appConfig.name}`,
+  },
   description: appConfig.description[DEFAULT_LANG],
   applicationName: appConfig.name,
+  keywords: ["digital products", "ebook", "template", "preset", "online course", "instant delivery", "dropcart", "dijital ürün"],
+  authors: [{ name: appConfig.name, url: `https://${appConfig.domain}` }],
+  creator: appConfig.name,
+  metadataBase: new URL(`https://${appConfig.domain}`),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "tr_TR",
+    url: `https://${appConfig.domain}`,
+    siteName: appConfig.name,
+    title: `${appConfig.name} — ${appConfig.tagline[DEFAULT_LANG]}`,
+    description: appConfig.description[DEFAULT_LANG],
+    images: [{ url: "/logo-dropcart.png", width: 800, height: 800, alt: appConfig.name }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${appConfig.name} — ${appConfig.tagline[DEFAULT_LANG]}`,
+    description: appConfig.description[DEFAULT_LANG],
+    images: ["/logo-dropcart.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  icons: {
+    icon: "/logo-dropcart.png",
+    apple: "/logo-dropcart.png",
+  },
 };
 
 export default function RootLayout({

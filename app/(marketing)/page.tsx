@@ -1,248 +1,409 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  Menu, X, Check, ChevronDown, ArrowRight,
+  ShoppingCart, Zap, CreditCard, Mail, Users, TicketPercent,
+  BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap,
+  Store, LayoutDashboard, Star,
+} from "lucide-react";
+import { useLang } from "@/components/i18n/language-provider";
+import { Logo } from "@/components/ui/logo";
+import { LanguageToggle } from "@/components/ui/language-toggle";
+import appConfig from "@/app.config";
+import { createClient } from "@/lib/supabase/client";
 
-const SPECS: Record<"tr" | "en", object> = {
-  tr: {
-    theme: "light",
-    lang: "tr",
-    brand: "Dropcart",
-    tagline: "dijital ürünleri keşfet, anında indir",
-    outro: "Binlerce dijital ürün. Sıfır bekleme.",
-    loaderSub: "dijital ürün marketi",
-    ctaPrimary: "Ürünleri Keşfet",
-    ctaSecondary: "Nasıl çalışır?",
-    accent: "#EC9B78",
-    particle: "shard",
-    particleTint: "#C8603A",
-    particleRoughness: 0.48,
-    particleMetalness: 0.08,
-    envColor: "#1B2D3A",
-    fontLink:
-      "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap",
-    displayFamily: "'Fraunces', serif",
-    layout: "left",
-    heroAlign: "left",
-    heroVAlign: "center",
-    titleGradient: ["#F5C5A3", "#EC9B78", "#C8603A"],
-    palette: ["#FBF7F2", "#F5C5A3", "#EC9B78", "#1B2D3A"],
-    formChain: ["sphere", "bloom", "leaf", "vortex", "product", "disperse"],
-    backgrounds: [
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190909_0efdb7a0-94f2-47f8-a78b-e791bbc9715e.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190911_3dffac10-515d-4ea3-8467-ef77d3bdfc9f.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_0f63abec-caab-478b-a494-bd0a04d6d56d.png",
-    ],
-    aboutHeading: "Yaratıcılar için <em>dijital market</em>.",
-    about: [
-      "E-kitabını, Notion şablonunu, Lightroom preset'ini veya online kursunu Dropcart'ta sat. Güvenli ödeme, anında otomatik teslimat — hiçbir teknik bilgi gerekmez.",
-      "Komisyon yok, stok yok, karmaşıklık yok. Sadece sen ve alıcıların.",
-    ],
-    aboutBig: "Uyurken bile teslim eder.",
-    shopHeading: "<em>Ürünleri</em> keşfet.",
-    shopSub: "E-kitap · Şablon · Preset · Kurs",
-    productMeta: "Dijital ürün · Anında teslimat",
-    email: "info@dropcart.digital",
-    footerFine: "Dropcart — dijital ürün marketi.",
-    year: 2026,
-    legal: "Dropcart tüm hakları saklıdır.",
-    products: [
-      {
-        n: "E-Kitap",
-        t: "Dijital kitap · PDF",
-        form: "book",
-        hex: "#EC9B78",
-        price: "$29",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190913_84f1f5c7-4663-47a7-b622-5f7b2b985e4c.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png",
-        line: "Bilgini sayfalara dök, dünyaya ulaş.",
-        d: "PDF formatında dijital kitaplarını sat. Alıcı ödeme yapar yapmaz indirme linki otomatik olarak e-postasına düşer.",
-      },
-      {
-        n: "Şablon",
-        t: "Notion · Figma · Excel",
-        form: "slab",
-        hex: "#C8603A",
-        price: "$19",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190913_29eb8a85-4995-4b8e-b8ae-05e08b946218.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190909_0efdb7a0-94f2-47f8-a78b-e791bbc9715e.png",
-        line: "Bir kez yap, binlerce kez sat.",
-        d: "Notion, Figma veya Excel şablonlarını yükle. Her satışta aynı kalitede dijital ürün, anında teslim.",
-      },
-      {
-        n: "Online Kurs",
-        t: "Video · Sertifika",
-        form: "crystal",
-        hex: "#A84330",
-        price: "$99",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190914_594d8983-9abb-45ad-be45-06159f7299ac.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190911_3dffac10-515d-4ea3-8467-ef77d3bdfc9f.png",
-        line: "Uzmanlığını kurs olarak paketle.",
-        d: "Video derslerini, PDF notlarını ve sertifikalarını tek bir kurs olarak sat. Dropcart erişimi otomatik yönetir.",
-      },
-    ],
-  },
-  en: {
-    theme: "light",
-    lang: "en",
-    brand: "Dropcart",
-    tagline: "discover digital products, download instantly",
-    outro: "Thousands of digital products. Zero wait.",
-    loaderSub: "digital product marketplace",
-    ctaPrimary: "Explore Products",
-    ctaSecondary: "How it works",
-    accent: "#EC9B78",
-    particle: "shard",
-    particleTint: "#C8603A",
-    particleRoughness: 0.48,
-    particleMetalness: 0.08,
-    envColor: "#1B2D3A",
-    fontLink:
-      "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap",
-    displayFamily: "'Fraunces', serif",
-    layout: "left",
-    heroAlign: "left",
-    heroVAlign: "center",
-    titleGradient: ["#F5C5A3", "#EC9B78", "#C8603A"],
-    palette: ["#FBF7F2", "#F5C5A3", "#EC9B78", "#1B2D3A"],
-    formChain: ["sphere", "bloom", "leaf", "vortex", "product", "disperse"],
-    backgrounds: [
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190909_0efdb7a0-94f2-47f8-a78b-e791bbc9715e.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190911_3dffac10-515d-4ea3-8467-ef77d3bdfc9f.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png",
-      "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_0f63abec-caab-478b-a494-bd0a04d6d56d.png",
-    ],
-    aboutHeading: "The <em>digital marketplace</em> for creators.",
-    about: [
-      "Upload your ebook, Notion template, Lightroom preset or online course to Dropcart. Secure checkout, instant auto-delivery — no technical knowledge needed.",
-      "No commission, no inventory, no complexity. Just you and your buyers.",
-    ],
-    aboutBig: "Delivers even while you sleep.",
-    shopHeading: "Explore <em>products</em>.",
-    shopSub: "Ebook · Template · Preset · Course",
-    productMeta: "Digital product · Instant delivery",
-    email: "info@dropcart.digital",
-    footerFine: "Dropcart — the digital product marketplace.",
-    year: 2026,
-    legal: "All rights reserved by Dropcart.",
-    products: [
-      {
-        n: "Ebook",
-        t: "Digital book · PDF",
-        form: "book",
-        hex: "#EC9B78",
-        price: "$29",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190913_84f1f5c7-4663-47a7-b622-5f7b2b985e4c.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png",
-        line: "Pour your knowledge onto the page.",
-        d: "Sell your digital books in PDF format. The moment the buyer pays, the download link lands automatically in their inbox.",
-      },
-      {
-        n: "Template",
-        t: "Notion · Figma · Excel",
-        form: "slab",
-        hex: "#C8603A",
-        price: "$19",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190913_29eb8a85-4995-4b8e-b8ae-05e08b946218.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190909_0efdb7a0-94f2-47f8-a78b-e791bbc9715e.png",
-        line: "Build once. Sell thousands of times.",
-        d: "Upload your Notion, Figma or Excel templates. Same quality digital product, instant delivery, every single sale.",
-      },
-      {
-        n: "Online Course",
-        t: "Video · Certificate",
-        form: "crystal",
-        hex: "#A84330",
-        price: "$99",
-        img: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190914_594d8983-9abb-45ad-be45-06159f7299ac.png",
-        world: "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190911_3dffac10-515d-4ea3-8467-ef77d3bdfc9f.png",
-        line: "Package your expertise as a course.",
-        d: "Sell your video lessons, PDF notes and certificates as one course. Dropcart manages access automatically.",
-      },
-    ],
-  },
+type ProductType = "ebook" | "template" | "preset" | "course";
+interface Product {
+  id: string; title: string; type: ProductType;
+  price: number; emoji: string; hue: string;
+  category_image_url: string | null;
+}
+
+const featureIcons: Record<string, React.ElementType> = {
+  store: Store, zap: Zap, "credit-card": CreditCard,
+  mail: Mail, users: Users, "ticket-percent": TicketPercent,
+};
+const typeIcon: Record<ProductType, React.ElementType> = {
+  ebook: BookOpen, template: LayoutTemplate,
+  preset: SlidersHorizontal, course: GraduationCap,
 };
 
-export default function MarketingPage() {
-  const [mounted, setMounted] = useState(false);
-  const [lang, setLang] = useState<"tr" | "en">("en");
+/* ── Navbar ─────────────────────────────────────────────────────────────── */
+function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const { lang } = useLang();
+  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const spec = SPECS[lang];
-  const src = mounted
-    ? `/engine.html#${encodeURIComponent(JSON.stringify(spec))}`
-    : null;
+  const links = [
+    { href: "#products",  tr: "Ürünler",   en: "Products" },
+    { href: "#features",  tr: "Nasıl Çalışır?", en: "How it works" },
+    { href: "#pricing",   tr: "Fiyatlar",   en: "Pricing" },
+  ];
 
   return (
-    <main
-      style={{
-        height: "100dvh",
-        width: "100%",
-        overflow: "hidden",
-        background: "#FBF7F2",
-        position: "relative",
-      }}
-    >
-      {src && (
-        <iframe
-          key={lang}
-          src={src}
-          title="Dropcart"
-          style={{
-            height: "100%",
-            width: "100%",
-            border: "none",
-            display: "block",
-          }}
-        />
-      )}
+    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 lg:px-8">
+        <Link href="/" className="shrink-0"><Logo /></Link>
 
-      {/* Dil toggle — iframe'in dışında, her zaman görünür */}
-      {mounted && (
-        <div
-          style={{
-            position: "fixed",
-            top: "22px",
-            right: "clamp(18px, 4vw, 42px)",
-            zIndex: 9999,
-            display: "flex",
-            gap: "4px",
-            background: "rgba(255,252,248,0.85)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(0,0,0,0.10)",
-            borderRadius: "999px",
-            padding: "4px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
-          }}
-        >
-          {(["tr", "en"] as const).map((l) => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: "10px",
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                padding: "7px 14px",
-                borderRadius: "999px",
-                border: "none",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                background: lang === l ? "#1B2D3A" : "transparent",
-                color: lang === l ? "#EC9B78" : "#7A5A3A",
-                fontWeight: lang === l ? 700 : 400,
-              }}
-            >
-              {l}
-            </button>
+        {/* Desktop links */}
+        <nav className="hidden md:flex items-center gap-1">
+          {links.map(l => (
+            <a key={l.href} href={l.href}
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              {lang === "tr" ? l.tr : l.en}
+            </a>
           ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <LanguageToggle className="hidden sm:flex" />
+          {isLoggedIn ? (
+            <Link href="/dashboard"
+              className="hidden md:inline-flex items-center gap-1.5 rounded-lg bg-sidebar px-3 py-1.5 text-sm font-semibold text-sidebar-foreground hover:opacity-90 transition-opacity">
+              <LayoutDashboard className="h-4 w-4" />
+              {lang === "tr" ? "Yönetim" : "Dashboard"}
+            </Link>
+          ) : (
+            <div className="hidden md:flex items-center gap-2">
+              <Link href="/login"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                {lang === "tr" ? "Giriş yap" : "Sign in"}
+              </Link>
+              <Link href="/signup"
+                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
+                {lang === "tr" ? "Kayıt ol" : "Sign up"}
+              </Link>
+            </div>
+          )}
+          <button onClick={() => setOpen(!open)} aria-label="Menu"
+            className="md:hidden grid h-9 w-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-1">
+          {links.map(l => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+              {lang === "tr" ? l.tr : l.en}
+            </a>
+          ))}
+          <div className="pt-3 border-t border-border mt-2 space-y-2">
+            {isLoggedIn ? (
+              <Link href="/dashboard" onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg bg-sidebar px-3 py-2.5 text-sm font-semibold text-sidebar-foreground">
+                <LayoutDashboard className="h-4 w-4" />
+                {lang === "tr" ? "Yönetim Paneli" : "Dashboard"}
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setOpen(false)}
+                  className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted">
+                  {lang === "tr" ? "Giriş yap" : "Sign in"}
+                </Link>
+                <Link href="/signup" onClick={() => setOpen(false)}
+                  className="flex items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
+                  {lang === "tr" ? "Ücretsiz kayıt ol" : "Sign up free"}
+                </Link>
+              </>
+            )}
+            <div className="flex justify-center pt-1"><LanguageToggle /></div>
+          </div>
         </div>
       )}
-    </main>
+    </header>
+  );
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+function Hero() {
+  const { t, lang } = useLang();
+  return (
+    <section className="relative overflow-hidden" style={{ background: "var(--grad-hero)" }}>
+      <div className="blob h-96 w-96 -top-24 -right-24 bg-primary/20" />
+      <div className="blob h-64 w-64 -bottom-16 -left-16 bg-primary/10" />
+      <div className="relative mx-auto max-w-6xl px-4 py-20 lg:py-28 lg:px-8 text-center">
+        <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary mb-6">
+          {t(appConfig.marketing.badge)}
+        </span>
+        <h1 className="font-display text-[clamp(34px,6vw,68px)] font-semibold leading-[1.08] tracking-tight text-foreground">
+          {t(appConfig.marketing.heroTitle)}{" "}
+          <span className="display-accent">{t(appConfig.marketing.heroAccent)}</span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-[clamp(15px,2vw,18px)] leading-relaxed text-muted-foreground">
+          {t(appConfig.marketing.heroSubtitle)}
+        </p>
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#products"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:opacity-90 transition-opacity">
+            <ShoppingCart className="h-5 w-5" />
+            {t(appConfig.marketing.heroCtaPrimary)}
+          </a>
+          <a href="#features"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground hover:bg-muted transition-colors">
+            {t(appConfig.marketing.heroCtaSecondary)}
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Stats ───────────────────────────────────────────────────────────────── */
+function Stats() {
+  const { t } = useLang();
+  return (
+    <section className="border-y border-border bg-card">
+      <div className="mx-auto max-w-6xl px-4 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-border">
+          {appConfig.marketing.stats.map((s) => (
+            <div key={t(s.label)} className="flex flex-col items-center justify-center py-8 px-4 text-center">
+              <p className="font-display text-3xl font-bold text-primary tabular-nums">{t(s.value)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t(s.label)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Features ────────────────────────────────────────────────────────────── */
+function Features() {
+  const { t, lang } = useLang();
+  return (
+    <section id="features" className="py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 lg:px-8">
+        <div className="text-center mb-14">
+          <p className="label-mono text-muted-foreground mb-3">{lang === "tr" ? "Nasıl Çalışır?" : "How it works"}</p>
+          <h2 className="font-display text-[clamp(28px,4vw,44px)] font-semibold tracking-tight">
+            {lang === "tr" ? "Her şey tek panelde" : "Everything in one place"}
+          </h2>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {appConfig.marketing.features.map((f) => {
+            const Icon = featureIcons[f.icon] ?? ShoppingCart;
+            return (
+              <div key={t(f.title)} className="rounded-2xl border border-border bg-card p-6 shadow-soft hover:shadow-pop transition-shadow">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 mb-4">
+                  <Icon className="h-5 w-5 text-primary" />
+                </span>
+                <h3 className="font-semibold text-base mb-2">{t(f.title)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(f.body)}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Products ────────────────────────────────────────────────────────────── */
+function Products({ products, lang }: { products: Product[]; lang: "tr" | "en" }) {
+  if (products.length === 0) return null;
+  return (
+    <section id="products" className="py-20 lg:py-28 bg-muted/40">
+      <div className="mx-auto max-w-6xl px-4 lg:px-8">
+        <div className="text-center mb-14">
+          <p className="label-mono text-muted-foreground mb-3">{lang === "tr" ? "Dijital Ürünler" : "Digital Products"}</p>
+          <h2 className="font-display text-[clamp(28px,4vw,44px)] font-semibold tracking-tight">
+            {lang === "tr" ? "Ürünleri Keşfet" : "Explore Products"}
+          </h2>
+          <p className="mt-3 text-muted-foreground text-sm">
+            {lang === "tr" ? "Ücretsiz Starter planıyla 1 ürün al, daha fazlası için yükselt." : "Grab 1 product free on Starter, upgrade for more."}
+          </p>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((p) => {
+            const Icon = typeIcon[p.type] ?? BookOpen;
+            return (
+              <Link key={p.id} href={`/p/${p.id}`}
+                className="group overflow-hidden rounded-2xl border border-border bg-card shadow-soft hover:-translate-y-0.5 hover:shadow-pop transition-all">
+                <div
+                  className="aspect-[16/9] overflow-hidden"
+                  style={!p.category_image_url ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.06 ${p.hue}) 0%, oklch(86% 0.13 ${p.hue}) 100%)` } : undefined}
+                >
+                  {p.category_image_url
+                    ? <img src={p.category_image_url} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    : <span className="flex h-full w-full items-center justify-center text-5xl drop-shadow-sm">{p.emoji}</span>
+                  }
+                </div>
+                <div className="p-4">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground mb-1">
+                    <Icon className="h-3 w-3" /> {p.type}
+                  </span>
+                  <p className="font-semibold text-sm truncate">{p.title}</p>
+                  <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                    <span className="text-xs text-muted-foreground">
+                      {lang === "tr" ? "Starter ile ücretsiz" : "Free on Starter"}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                      {lang === "tr" ? "Görüntüle" : "View"}
+                      <ArrowRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+        <div className="mt-10 text-center">
+          <a href="#pricing"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
+            {lang === "tr" ? "Tüm planları gör" : "See all plans"}
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Pricing ─────────────────────────────────────────────────────────────── */
+function Pricing() {
+  const { t, lang } = useLang();
+  const planLinks: Record<string, string> = {
+    Starter: "/signup",
+    Creator: "/signup?plan=creator",
+    Studio: "/signup?plan=studio",
+  };
+  return (
+    <section id="pricing" className="py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 lg:px-8">
+        <div className="text-center mb-14">
+          <p className="label-mono text-muted-foreground mb-3">{lang === "tr" ? "Fiyatlandırma" : "Pricing"}</p>
+          <h2 className="font-display text-[clamp(28px,4vw,44px)] font-semibold tracking-tight">
+            {lang === "tr" ? "Senin için doğru plan" : "The right plan for you"}
+          </h2>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-3 lg:items-start">
+          {appConfig.marketing.pricing.map((tier) => (
+            <div key={tier.name}
+              className={`relative flex flex-col rounded-2xl border p-7 shadow-soft ${tier.featured ? "border-primary bg-primary/5 shadow-pop" : "border-border bg-card"}`}>
+              {tier.featured && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground">
+                  {lang === "tr" ? "En Popüler" : "Most Popular"}
+                </span>
+              )}
+              <div className="mb-6">
+                <p className="font-semibold text-lg">{tier.name}</p>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="font-display text-4xl font-bold">{tier.price}</span>
+                  {tier.period && <span className="text-sm text-muted-foreground">{tier.period}</span>}
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{t(tier.tagline)}</p>
+              </div>
+              <ul className="space-y-3 flex-1 mb-8">
+                {tier.features.map((f) => (
+                  <li key={t(f)} className="flex items-start gap-2.5 text-sm">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/15 mt-0.5">
+                      <Check className="h-3 w-3 text-primary" />
+                    </span>
+                    {t(f)}
+                  </li>
+                ))}
+              </ul>
+              <Link href={planLinks[tier.name] ?? "/signup"}
+                className={`flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-opacity hover:opacity-90 ${tier.featured ? "bg-primary text-primary-foreground shadow-md shadow-primary/25" : "bg-sidebar text-sidebar-foreground"}`}>
+                {t(tier.cta)}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── FAQ ─────────────────────────────────────────────────────────────────── */
+function FAQ() {
+  const { t, lang } = useLang();
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section className="py-20 lg:py-28 bg-muted/30 border-t border-border">
+      <div className="mx-auto max-w-3xl px-4 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="font-display text-[clamp(26px,4vw,40px)] font-semibold tracking-tight">
+            {lang === "tr" ? "Sık Sorulan Sorular" : "Frequently Asked Questions"}
+          </h2>
+        </div>
+        <div className="space-y-3">
+          {appConfig.marketing.faq.map((item, i) => (
+            <div key={i} className="rounded-2xl border border-border bg-card overflow-hidden">
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="flex w-full items-center justify-between px-6 py-4 text-left text-sm font-semibold hover:bg-muted/50 transition-colors"
+              >
+                {t(item.q)}
+                <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open === i ? "rotate-180" : ""}`} />
+              </button>
+              {open === i && (
+                <div className="px-6 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">
+                  {t(item.a)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+function Footer() {
+  const { lang } = useLang();
+  return (
+    <footer className="border-t border-border py-12" style={{ background: "var(--color-sidebar)" }}>
+      <div className="mx-auto max-w-6xl px-4 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <Link href="/"><Logo onDark /></Link>
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm" style={{ color: "var(--color-sidebar-muted)" }}>
+            <a href="#products" className="hover:text-white transition-colors">{lang === "tr" ? "Ürünler" : "Products"}</a>
+            <a href="#features" className="hover:text-white transition-colors">{lang === "tr" ? "Nasıl Çalışır?" : "How it works"}</a>
+            <a href="#pricing" className="hover:text-white transition-colors">{lang === "tr" ? "Fiyatlar" : "Pricing"}</a>
+            <Link href="/login" className="hover:text-white transition-colors">{lang === "tr" ? "Giriş yap" : "Sign in"}</Link>
+            <Link href="/signup" className="hover:text-white transition-colors">{lang === "tr" ? "Kayıt ol" : "Sign up"}</Link>
+          </nav>
+        </div>
+        <div className="mt-8 border-t pt-6 text-center text-xs" style={{ borderColor: "var(--color-sidebar-border)", color: "var(--color-sidebar-muted)" }}>
+          © 2026 {appConfig.name} · {appConfig.domain} · {lang === "tr" ? "Tüm hakları saklıdır." : "All rights reserved."}
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+export default function MarketingPage() {
+  const { lang } = useLang();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from("products").select("id,title,type,price,emoji,hue,category_image_url").eq("live", true).limit(6)
+      .then(({ data }) => setProducts((data ?? []) as Product[]));
+    supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+  }, []);
+
+  return (
+    <div className="min-h-dvh">
+      <Navbar isLoggedIn={isLoggedIn} />
+      <Hero />
+      <Stats />
+      <Features />
+      <Products products={products} lang={lang} />
+      <Pricing />
+      <FAQ />
+      <Footer />
+    </div>
   );
 }
