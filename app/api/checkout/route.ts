@@ -9,6 +9,24 @@ export async function POST(req: Request) {
   const { productId } = await req.json();
 
   const supabase = await createClient();
+
+  // Check logged-in user's quota
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
+    const plan = profile?.plan ?? "starter";
+
+    if (plan === "creator") {
+      const { count } = await supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("buyer_email", user.email ?? "");
+      if ((count ?? 0) >= 5) {
+        return NextResponse.json({ error: "quota_exceeded", plan }, { status: 403 });
+      }
+    }
+  }
+
   const { data: product } = await supabase
     .from("products")
     .select("id, title, price, emoji, hue")

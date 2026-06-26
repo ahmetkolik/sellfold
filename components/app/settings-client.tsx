@@ -269,10 +269,10 @@ export function SettingsClient({
               <p className="font-medium">{lang === "tr" ? "Mevcut plan" : "Current plan"}</p>
               <p className="text-sm text-muted-foreground">
                 {plan === "starter"
-                  ? (lang === "tr" ? "3 ürün, %5 işlem payı" : "3 products, 5% per-sale fee")
+                  ? (lang === "tr" ? "1 ücretsiz ürün indirme" : "1 free product download")
                   : plan === "creator"
-                  ? (lang === "tr" ? "Sınırsız ürün, işlem payı yok" : "Unlimited products, no per-sale fee")
-                  : (lang === "tr" ? "Creator + ekip & webhook" : "Creator + team & webhooks")}
+                  ? (lang === "tr" ? "5 ürün kotası, işlem payı yok" : "5 product quota, no per-sale fee")
+                  : (lang === "tr" ? "Sınırsız ürün + GitHub push + ekip" : "Unlimited products + GitHub push + team")}
               </p>
             </div>
             <Badge tone={plan === "starter" ? "neutral" : "success"}>
@@ -287,12 +287,12 @@ export function SettingsClient({
                   <p className="font-semibold">Creator</p>
                   <p className="text-2xl font-display font-bold mt-0.5">$12<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {lang === "tr" ? "Sınırsız ürün · Kupon · Özel domain" : "Unlimited products · Coupons · Custom domain"}
+                    {lang === "tr" ? "5 ürün kotası · Kupon · Özel domain" : "5 product quota · Coupons · Custom domain"}
                   </p>
                 </div>
                 <Button className="gap-2 mt-auto" onClick={() => subscribe("creator")} disabled={billingLoading !== null}>
                   {billingLoading === "creator" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpRight className="h-4 w-4" />}
-                  {lang === "tr" ? "Creator'a geç" : "Upgrade to Creator"}
+                  {lang === "tr" ? "Creator'a Geç" : "Upgrade to Creator"}
                 </Button>
               </div>
               <div className="flex flex-col gap-3 rounded-xl border border-primary/40 bg-primary/5 p-4">
@@ -300,12 +300,12 @@ export function SettingsClient({
                   <p className="font-semibold">Studio</p>
                   <p className="text-2xl font-display font-bold mt-0.5">$29<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {lang === "tr" ? "Her şey + ekip rolleri · API · Webhook" : "Everything + team roles · API · Webhooks"}
+                    {lang === "tr" ? "Sınırsız ürün · GitHub push · API · Ekip" : "Unlimited products · GitHub push · API · Team"}
                   </p>
                 </div>
                 <Button variant="outline" className="gap-2 mt-auto" onClick={() => subscribe("studio")} disabled={billingLoading !== null}>
                   {billingLoading === "studio" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpRight className="h-4 w-4" />}
-                  {lang === "tr" ? "Studio'ya geç" : "Upgrade to Studio"}
+                  {lang === "tr" ? "Studio'ya Geç" : "Upgrade to Studio"}
                 </Button>
               </div>
             </div>

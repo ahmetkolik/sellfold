@@ -34,3 +34,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Playwright MCP session files
+.playwright-mcp/

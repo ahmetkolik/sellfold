@@ -27,6 +27,7 @@ interface Product {
   live: boolean;
   category: string | null;
   category_image_url: string | null;
+  gallery_images: string[] | null;
 }
 
 const typeIcon: Record<ProductType, typeof BookOpen> = {
@@ -54,6 +55,64 @@ const typeIncludes: Record<ProductType, { tr: string[]; en: string[] }> = {
 
 const typeInclIcon = [Download, FileText, Video, Key];
 
+function GallerySection({ product }: { product: Product }) {
+  const TypeIcon = typeIcon[product.type] ?? BookOpen;
+  const allImages: { src: string | null; isEmoji: boolean }[] = [
+    { src: product.category_image_url, isEmoji: !product.category_image_url },
+    ...(product.gallery_images ?? []).slice(0, 4).map((src) => ({ src, isEmoji: false })),
+  ];
+  const [active, setActive] = useState(0);
+  const current = allImages[active];
+
+  return (
+    <div className="space-y-3">
+      {/* Main image */}
+      <div
+        className="aspect-video w-full overflow-hidden rounded-2xl shadow-pop"
+        style={current.isEmoji ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` } : undefined}
+      >
+        {current.isEmoji
+          ? <span className="flex h-full w-full items-center justify-center text-8xl drop-shadow-lg">{product.emoji}</span>
+          : <img src={current.src!} alt={product.title} className="h-full w-full object-cover" />
+        }
+      </div>
+
+      {/* Thumbnails (only if more than 1 image) */}
+      {allImages.length > 1 && (
+        <div className="flex gap-2">
+          {allImages.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`relative aspect-video w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${active === i ? "border-primary" : "border-border opacity-60 hover:opacity-100"}`}
+              style={img.isEmoji ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` } : undefined}
+            >
+              {img.isEmoji
+                ? <span className="flex h-full w-full items-center justify-center text-base">{product.emoji}</span>
+                : <img src={img.src!} alt={`${i + 1}`} className="h-full w-full object-cover" />
+              }
+              <span className="absolute bottom-0 left-0 right-0 bg-black/40 text-center text-[9px] text-white">{i + 1}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Type + category badge */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium">
+          <TypeIcon className="h-3.5 w-3.5 text-primary" />
+          {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
+        </span>
+        {product.category && (
+          <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
+            {product.category}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const { lang, t } = useLang();
@@ -63,13 +122,23 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+  const [claimSuccess, setClaimSuccess] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     const supabase = createClient();
+
+    // Check logged-in user plan
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from("profiles").select("plan").eq("id", user.id).single()
+        .then(({ data }) => setUserPlan(data?.plan ?? "starter"));
+    });
+
     supabase
       .from("products")
-      .select("id, title, type, price, hue, emoji, live, category, category_image_url")
+      .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images")
       .eq("id", id)
       .eq("live", true)
       .single()
@@ -79,7 +148,7 @@ export default function ProductPage() {
         setLoading(false);
         supabase
           .from("products")
-          .select("id, title, type, price, hue, emoji, live, category, category_image_url")
+          .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images")
           .eq("live", true)
           .neq("id", id)
           .limit(3)
@@ -89,7 +158,49 @@ export default function ProductPage() {
 
   async function buy() {
     if (!product) return;
+
+    // Not logged in → redirect to signup
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      window.location.href = `/signup?redirect=/p/${product.id}`;
+      return;
+    }
+
     setBuying(true);
+
+    // Starter plan → free claim
+    if (!userPlan || userPlan === "starter") {
+      try {
+        const res = await fetch("/api/claim-product", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: product.id }),
+        });
+        const data = await res.json();
+        if (data.error === "quota_exceeded") {
+          window.location.href = "/settings#billing";
+          return;
+        }
+        if (data.error === "already_claimed") {
+          alert(lang === "tr" ? "Bu ürünü zaten aldın." : "You already claimed this product.");
+          setBuying(false);
+          return;
+        }
+        if (!res.ok) {
+          alert(lang === "tr" ? "Bir hata oluştu." : "An error occurred.");
+          setBuying(false);
+          return;
+        }
+        setClaimSuccess(true);
+        setBuying(false);
+      } catch {
+        setBuying(false);
+      }
+      return;
+    }
+
+    // Creator (5 limit) or Studio (unlimited) → Stripe checkout
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -97,6 +208,10 @@ export default function ProductPage() {
         body: JSON.stringify({ productId: product.id }),
       });
       const { url, error } = await res.json();
+      if (error === "quota_exceeded") {
+        window.location.href = "/settings#billing";
+        return;
+      }
       if (error || !url) { alert(lang === "tr" ? "Bir hata oluştu." : "An error occurred."); setBuying(false); return; }
       window.location.href = url;
     } catch {
@@ -106,20 +221,26 @@ export default function ProductPage() {
 
   const m = {
     tr: {
-      back: "Mağazaya dön", buyNow: "Satın al — anında teslim", buying: "Yönlendiriliyor…",
+      back: "Mağazaya dön",
+      buyNow: userPlan === "starter" || !userPlan ? "Ücretsiz Al (Starter)" : "Satın al",
+      buying: "İşleniyor…",
       includes: "Neler dahil?", trust1: "Güvenli ödeme", trust2: "Anında teslimat", trust3: "30 gün iade",
       relatedTitle: "Öne çıkan ürünler", buy: "Satın al",
       notFound: "Ürün bulunamadı", notFoundSub: "Bu ürün mevcut değil veya yayından kaldırılmış olabilir.",
       loading: "Yükleniyor…",
       reviewsLabel: "değerlendirme",
+      claimed: "Ürün e-postana gönderildi! 🎉",
     },
     en: {
-      back: "Back to store", buyNow: "Buy now — instant delivery", buying: "Redirecting…",
+      back: "Back to store",
+      buyNow: userPlan === "starter" || !userPlan ? "Get Free (Starter)" : "Buy now",
+      buying: "Processing…",
       includes: "What's included", trust1: "Secure checkout", trust2: "Instant delivery", trust3: "30-day refund",
       relatedTitle: "More products", buy: "Buy",
       notFound: "Product not found", notFoundSub: "This product may not exist or has been unpublished.",
       loading: "Loading…",
       reviewsLabel: "reviews",
+      claimed: "Product sent to your email! 🎉",
     },
   }[lang];
 
@@ -168,30 +289,9 @@ export default function ProductPage() {
       <section className="mx-auto max-w-6xl px-5 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-start">
 
-          {/* Left: cover + preview thumbnails */}
-          <div className="space-y-4">
-            <div
-              className="aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-pop"
-              style={!product.category_image_url ? { backgroundImage: `linear-gradient(140deg, oklch(94% 0.07 ${product.hue}) 0%, oklch(82% 0.18 ${product.hue}) 100%)` } : undefined}
-            >
-              {product.category_image_url
-                ? <img src={product.category_image_url} alt={product.title} className="h-full w-full object-cover" />
-                : <span className="flex h-full w-full items-center justify-center text-8xl drop-shadow-lg">{product.emoji}</span>
-              }
-            </div>
-            {/* Type + category badge */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium">
-                <TypeIcon className="h-3.5 w-3.5 text-primary" />
-                {product.type.charAt(0).toUpperCase() + product.type.slice(1)}
-              </span>
-              {product.category && (
-                <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
-                  {product.category}
-                </span>
-              )}
-            </div>
-          </div>
+          {/* Left: gallery */}
+          <GallerySection product={product} />
+
 
           {/* Right: buy card (sticky) */}
           <div className="lg:sticky lg:top-24 space-y-5">
@@ -219,17 +319,26 @@ export default function ProductPage() {
               </div>
             </div>
 
+            {/* Claim success */}
+            {claimSuccess && (
+              <div className="flex items-center gap-2 rounded-xl bg-success/10 px-4 py-3 text-sm font-medium text-success">
+                <Check className="h-4 w-4 shrink-0" /> {m.claimed}
+              </div>
+            )}
+
             {/* Buy button */}
-            <button
-              onClick={buy}
-              disabled={buying}
-              className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-4 text-[15px] font-semibold text-primary-foreground shadow-md shadow-primary/25 transition hover:opacity-90 disabled:opacity-70"
-            >
-              {buying
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> {m.buying}</>
-                : <><ShoppingCart className="h-4 w-4" /> {m.buyNow}</>
-              }
-            </button>
+            {!claimSuccess && (
+              <button
+                onClick={buy}
+                disabled={buying}
+                className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-primary px-6 py-4 text-[15px] font-semibold text-primary-foreground shadow-md shadow-primary/25 transition hover:opacity-90 disabled:opacity-70"
+              >
+                {buying
+                  ? <><Loader2 className="h-4 w-4 animate-spin" /> {m.buying}</>
+                  : <><ShoppingCart className="h-4 w-4" /> {m.buyNow}</>
+                }
+              </button>
+            )}
 
             {/* Trust badges */}
             <div className="flex items-center justify-around rounded-xl border border-border bg-card/60 py-3.5 px-2">

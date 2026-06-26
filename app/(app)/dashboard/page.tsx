@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/components/i18n/language-provider";
 import {
-  payouts, revenue14d as demoRev14d, revenueMonths as demoRevMonths, activity, funnel, balance,
+  payouts as demoPayouts, revenue14d as demoRev14d, revenueMonths as demoRevMonths, activity as demoActivity, funnel as demoFunnel, balance as demoBalance,
 } from "@/lib/demo/data";
 import type { Product, Customer, ProductType } from "@/lib/demo/data";
 import { fetchProducts, fetchOrders, deriveCustomers, computeStats, computeRevenue14d, computeRevenueMonths, type Order } from "@/lib/supabase/data";
@@ -64,6 +64,7 @@ export default function VitrinDashboard() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [rev14d, setRev14d] = useState(demoRev14d);
   const [revMonths, setRevMonths] = useState(demoRevMonths);
+  const [hasRealData, setHasRealData] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -72,6 +73,7 @@ export default function VitrinDashboard() {
       setSales(orders);
       setCustomers(deriveCustomers(orders));
       if (orders.length > 0) {
+        setHasRealData(true);
         setRev14d(computeRevenue14d(orders));
         setRevMonths(computeRevenueMonths(orders));
       }
@@ -130,7 +132,7 @@ export default function VitrinDashboard() {
     { icon: Percent, label: m.conversion, value: store.conversion, delta: store.conversionDelta, up: true },
     { icon: Receipt, label: m.avgOrder, value: store.avgOrder ? formatMoney(store.avgOrder) : "—", delta: store.avgOrderDelta, up: true },
     { icon: Undo2, label: m.refund, value: store.refundRate, delta: store.refundDelta, up: false },
-    { icon: Banknote, label: m.nextPayout, value: formatMoney(balance.available), delta: balance.nextDate, up: true, plain: true },
+    { icon: Banknote, label: m.nextPayout, value: formatMoney(demoBalance.available), delta: demoBalance.nextDate, up: true, plain: true },
   ];
 
   return (
@@ -281,18 +283,22 @@ export default function VitrinDashboard() {
 
           <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
             <h2 className="font-display text-lg font-semibold tracking-tight">{m.payoutsT}</h2>
-            <ul className="mt-4 space-y-2.5">
-              {payouts.map((po) => (
-                <li key={po.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
-                  <span className={`h-2 w-2 rounded-full ${po.status === "paid" ? "bg-success" : po.status === "pending" ? "bg-warning" : "bg-muted-foreground"}`} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{t(po.label)}</p>
-                    <p className="text-xs text-muted-foreground">{po.date} · <span className={payoutTone[po.status]}>{statusLabel[po.status]}</span></p>
-                  </div>
-                  <span className="font-display text-sm font-semibold tabular-nums">{po.amount ? formatMoney(po.amount) : "—"}</span>
-                </li>
-              ))}
-            </ul>
+            {!hasRealData && loaded ? (
+              <p className="mt-4 text-sm text-muted-foreground">{m.noSales}</p>
+            ) : (
+              <ul className="mt-4 space-y-2.5">
+                {demoPayouts.map((po) => (
+                  <li key={po.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
+                    <span className={`h-2 w-2 rounded-full ${po.status === "paid" ? "bg-success" : po.status === "pending" ? "bg-warning" : "bg-muted-foreground"}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{t(po.label)}</p>
+                      <p className="text-xs text-muted-foreground">{po.date} · <span className={payoutTone[po.status]}>{statusLabel[po.status]}</span></p>
+                    </div>
+                    <span className="font-display text-sm font-semibold tabular-nums">{po.amount ? formatMoney(po.amount) : "—"}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
@@ -329,17 +335,24 @@ export default function VitrinDashboard() {
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
           <h2 className="font-display text-lg font-semibold tracking-tight">{m.activity}</h2>
-          <ul className="mt-4 space-y-4">
-            {activity.map((a) => (
-              <li key={a.id} className="flex items-start gap-3">
-                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${a.tone === "success" ? "bg-success" : a.tone === "warning" ? "bg-warning" : a.tone === "info" ? "bg-info" : "bg-primary"}`} />
-                <div className="min-w-0 text-sm">
-                  <p className="leading-snug"><span className="font-medium">{a.who}</span> <span className="text-muted-foreground">{t(a.action)}</span> <span className="font-medium">{a.target}</span></p>
-                  <p className="text-xs text-muted-foreground">{formatRelative(a.at)}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {!hasRealData && loaded ? (
+            <div className="mt-6 flex flex-col items-center py-8 text-center text-muted-foreground">
+              <span className="text-3xl">📋</span>
+              <p className="mt-3 text-sm">{m.noSales}</p>
+            </div>
+          ) : (
+            <ul className="mt-4 space-y-4">
+              {demoActivity.map((a) => (
+                <li key={a.id} className="flex items-start gap-3">
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${a.tone === "success" ? "bg-success" : a.tone === "warning" ? "bg-warning" : a.tone === "info" ? "bg-info" : "bg-primary"}`} />
+                  <div className="min-w-0 text-sm">
+                    <p className="leading-snug"><span className="font-medium">{a.who}</span> <span className="text-muted-foreground">{t(a.action)}</span> <span className="font-medium">{a.target}</span></p>
+                    <p className="text-xs text-muted-foreground">{formatRelative(a.at)}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 
@@ -353,9 +366,15 @@ export default function VitrinDashboard() {
             </div>
             <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary"><Filter className="h-4 w-4" /></span>
           </div>
+          {!hasRealData && loaded ? (
+            <div className="mt-6 flex flex-col items-center py-8 text-center text-muted-foreground">
+              <span className="text-3xl">📊</span>
+              <p className="mt-3 text-sm">{m.noSales}</p>
+            </div>
+          ) : (
           <ul className="mt-5 space-y-2.5">
-            {funnel.map((f, i) => {
-              const pct = (f.value / funnel[0].value) * 100;
+            {demoFunnel.map((f, i) => {
+              const pct = (f.value / demoFunnel[0].value) * 100;
               return (
                 <li key={t(f.label)}>
                   <div className="mb-1 flex items-baseline justify-between">
@@ -370,7 +389,7 @@ export default function VitrinDashboard() {
                       className="h-full rounded-full transition-all"
                       style={{
                         width: `${pct}%`,
-                        backgroundImage: i === funnel.length - 1
+                        backgroundImage: i === demoFunnel.length - 1
                           ? "linear-gradient(90deg, var(--color-primary), var(--color-serif))"
                           : `linear-gradient(90deg, color-mix(in oklch, var(--color-primary) ${70 - i * 14}%, transparent), color-mix(in oklch, var(--color-primary) ${40 - i * 8}%, transparent))`,
                       }}
@@ -380,6 +399,7 @@ export default function VitrinDashboard() {
               );
             })}
           </ul>
+          )}
         </div>
 
         <div className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-soft">
@@ -387,23 +407,32 @@ export default function VitrinDashboard() {
             <h2 className="font-display text-lg font-semibold tracking-tight">{m.balanceT}</h2>
             <span className="grid h-9 w-9 place-items-center rounded-full bg-success/12 text-success"><Banknote className="h-4 w-4" /></span>
           </div>
+          {!hasRealData && loaded ? (
+            <div className="mt-6 flex flex-1 flex-col items-center justify-center py-8 text-center text-muted-foreground">
+              <span className="text-3xl">💳</span>
+              <p className="mt-3 text-sm">{m.noSales}</p>
+            </div>
+          ) : (
+            <>
           <p className="label-mono mt-4 text-muted-foreground">{m.available}</p>
-          <p className="mt-1 font-display text-[34px] font-semibold leading-none tabular-nums text-primary">{formatMoney(balance.available)}</p>
+          <p className="mt-1 font-display text-[34px] font-semibold leading-none tabular-nums text-primary">{formatMoney(demoBalance.available)}</p>
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-muted/50 p-3">
               <p className="text-[11px] text-muted-foreground">{m.clearing}</p>
-              <p className="mt-1 font-display text-base font-semibold tabular-nums">{formatMoney(balance.pending)}</p>
+              <p className="mt-1 font-display text-base font-semibold tabular-nums">{formatMoney(demoBalance.pending)}</p>
             </div>
             <div className="rounded-xl bg-muted/50 p-3">
               <p className="text-[11px] text-muted-foreground">{m.paidMtd}</p>
-              <p className="mt-1 font-display text-base font-semibold tabular-nums">{formatMoney(balance.paidThisMonth)}</p>
+              <p className="mt-1 font-display text-base font-semibold tabular-nums">{formatMoney(demoBalance.paidThisMonth)}</p>
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between rounded-xl border border-border px-3 py-2.5 text-xs">
             <span className="text-muted-foreground">{m.nextTransfer}</span>
-            <span className="font-medium">{balance.nextDate}</span>
+            <span className="font-medium">{demoBalance.nextDate}</span>
           </div>
           <Button className="mt-4 w-full gap-2"><ArrowUpRight className="h-4 w-4" /> {m.transfer}</Button>
+            </>
+          )}
         </div>
       </section>
 

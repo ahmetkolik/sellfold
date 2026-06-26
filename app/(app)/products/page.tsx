@@ -43,27 +43,50 @@ const HUE_OPTIONS = [
   { label: "Kırmızı", value: "10" },
 ];
 
+interface EditableProduct {
+  id: string;
+  title: string;
+  type: ProductType;
+  price: number;
+  emoji: string;
+  hue: string;
+  live: boolean;
+  category: string | null;
+  category_image_url?: string | null;
+  file_url?: string | null;
+  file_url_en?: string | null;
+  gallery_images?: string[];
+}
+
+const FILE_ACCEPT = ".pdf,.zip,.epub,.docx,.xlsx,.pptx,.mp4,.mp3,.png,.jpg,.jpeg,.gif,.svg,.ai,.psd,.figma";
+
 function ProductModal({
   onClose,
   onSaved,
+  editProduct,
 }: {
   onClose: () => void;
   onSaved: () => void;
+  editProduct?: EditableProduct;
 }) {
   const { lang } = useLang();
+  const isEdit = !!editProduct;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
-  const [categoryImagePreview, setCategoryImagePreview] = useState<string | null>(null);
-  const [digitalFile, setDigitalFile] = useState<File | null>(null);
+  const [categoryImagePreview, setCategoryImagePreview] = useState<string | null>(editProduct?.category_image_url ?? null);
+  const [galleryFiles, setGalleryFiles] = useState<(File | null)[]>([null, null, null, null]);
+  const [galleryPreviews, setGalleryPreviews] = useState<(string | null)[]>(editProduct?.gallery_images?.slice(0, 4) ?? [null, null, null, null]);
+  const [digitalFileTr, setDigitalFileTr] = useState<File | null>(null);
+  const [digitalFileEn, setDigitalFileEn] = useState<File | null>(null);
   const [form, setForm] = useState({
-    title: "",
-    type: "ebook" as ProductType,
-    price: "",
-    emoji: "📦",
-    hue: "220",
-    live: false,
-    category: "",
+    title: editProduct?.title ?? "",
+    type: (editProduct?.type ?? "ebook") as ProductType,
+    price: editProduct ? String(editProduct.price) : "",
+    emoji: editProduct?.emoji ?? "📦",
+    hue: editProduct?.hue ?? "220",
+    live: editProduct?.live ?? false,
+    category: editProduct?.category ?? "",
   });
 
   const set = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
@@ -73,6 +96,12 @@ function ProductModal({
     if (!file) return;
     setCategoryImageFile(file);
     setCategoryImagePreview(URL.createObjectURL(file));
+  }
+
+  async function uploadFile(file: File, path: string): Promise<string> {
+    const supabase = createClient();
+    await supabase.storage.from("product-files").upload(path, file, { upsert: true });
+    return supabase.storage.from("product-files").getPublicUrl(path).data.publicUrl;
   }
 
   async function handleSave() {
@@ -86,32 +115,37 @@ function ProductModal({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError("Session not found"); setLoading(false); return; }
 
-    let categoryImageUrl: string | null = null;
+    let categoryImageUrl: string | null = editProduct?.category_image_url ?? null;
     if (categoryImageFile) {
       const ext = categoryImageFile.name.split(".").pop();
-      const path = `category-images/${user.id}/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("product-files")
-        .upload(path, categoryImageFile, { upsert: true });
-      if (upErr) { setError(upErr.message); setLoading(false); return; }
-      const { data: urlData } = supabase.storage.from("product-files").getPublicUrl(path);
-      categoryImageUrl = urlData.publicUrl;
+      categoryImageUrl = await uploadFile(categoryImageFile, `category-images/${user.id}/${Date.now()}.${ext}`);
     }
 
-    let fileUrl: string | null = null;
-    if (digitalFile) {
-      const ext = digitalFile.name.split(".").pop();
-      const path = `files/${user.id}/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("product-files")
-        .upload(path, digitalFile, { upsert: true });
-      if (upErr) { setError(upErr.message); setLoading(false); return; }
-      const { data: urlData } = supabase.storage.from("product-files").getPublicUrl(path);
-      fileUrl = urlData.publicUrl;
+    let fileUrl: string | null = editProduct?.file_url ?? null;
+    if (digitalFileTr) {
+      const ext = digitalFileTr.name.split(".").pop();
+      fileUrl = await uploadFile(digitalFileTr, `files/${user.id}/${Date.now()}_tr.${ext}`);
     }
 
-    const { error: err } = await supabase.from("products").insert({
-      user_id: user.id,
+    let fileUrlEn: string | null = editProduct?.file_url_en ?? null;
+    if (digitalFileEn) {
+      const ext = digitalFileEn.name.split(".").pop();
+      fileUrlEn = await uploadFile(digitalFileEn, `files/${user.id}/${Date.now()}_en.${ext}`);
+    }
+
+    const newGalleryUrls: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      const existing = editProduct?.gallery_images?.[i];
+      if (galleryFiles[i]) {
+        const ext = galleryFiles[i]!.name.split(".").pop();
+        const url = await uploadFile(galleryFiles[i]!, `gallery/${user.id}/${Date.now()}_${i}.${ext}`);
+        newGalleryUrls.push(url);
+      } else if (existing) {
+        newGalleryUrls.push(existing);
+      }
+    }
+
+    const payload = {
       title: form.title.trim(),
       type: form.type,
       price: priceVal,
@@ -121,18 +155,27 @@ function ProductModal({
       category: form.category.trim() || null,
       category_image_url: categoryImageUrl,
       file_url: fileUrl,
-    });
+      file_url_en: fileUrlEn,
+      gallery_images: newGalleryUrls,
+    };
 
-    if (err) { setError(err.message); setLoading(false); return; }
+    let dbError;
+    if (isEdit) {
+      ({ error: dbError } = await supabase.from("products").update(payload).eq("id", editProduct.id));
+    } else {
+      ({ error: dbError } = await supabase.from("products").insert({ ...payload, user_id: user.id }));
+    }
+
+    if (dbError) { setError(dbError.message); setLoading(false); return; }
     onSaved();
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-background shadow-2xl">
+      <div className="w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl">
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="font-display text-xl font-semibold">
-            {lang === "tr" ? "Yeni Ürün" : "New Product"}
+            {isEdit ? (lang === "tr" ? "Ürünü Düzenle" : "Edit Product") : (lang === "tr" ? "Yeni Ürün" : "New Product")}
           </h2>
           <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted">
             <X className="h-4 w-4" />
@@ -141,7 +184,10 @@ function ProductModal({
 
         <div className="space-y-5 p-6">
           {/* Preview */}
-          <Cover hue={form.hue} emoji={form.emoji} className="h-28 w-full rounded-xl" />
+          {categoryImagePreview
+            ? <img src={categoryImagePreview} alt="" className="h-28 w-full rounded-xl object-cover" />
+            : <Cover hue={form.hue} emoji={form.emoji} className="h-28 w-full rounded-xl" />
+          }
 
           <div className="space-y-1.5">
             <Label>{lang === "tr" ? "Başlık" : "Title"}</Label>
@@ -218,7 +264,7 @@ function ProductModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label>{lang === "tr" ? "Kategori Görseli" : "Category Image"}</Label>
+              <Label>{lang === "tr" ? "Kapak Görseli" : "Cover Image"}</Label>
               <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
                 <input type="file" accept="image/*" className="hidden" onChange={handleCategoryImage} />
                 {categoryImagePreview
@@ -231,24 +277,53 @@ function ProductModal({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>{lang === "tr" ? "Dijital Dosya (PDF, ZIP…)" : "Digital File (PDF, ZIP…)"}</Label>
+          {/* Gallery images (4 slots = total 5 with cover) */}
+          <div className="space-y-2">
+            <Label>{lang === "tr" ? "Ürün Galeri Görselleri (maks. 4 ek görsel)" : "Product Gallery Images (max 4 extra)"}</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {[0, 1, 2, 3].map((i) => (
+                <label key={i} className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border border-dashed border-border hover:border-primary transition">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const newFiles = [...galleryFiles]; newFiles[i] = file; setGalleryFiles(newFiles);
+                      const newPreviews = [...galleryPreviews]; newPreviews[i] = URL.createObjectURL(file); setGalleryPreviews(newPreviews);
+                    }}
+                  />
+                  {galleryPreviews[i]
+                    ? <img src={galleryPreviews[i]!} alt="" className="h-full w-full object-cover" />
+                    : <span className="flex h-full w-full items-center justify-center text-muted-foreground"><ImagePlus className="h-5 w-5" /></span>
+                  }
+                  <span className="absolute bottom-0 left-0 right-0 bg-black/40 py-0.5 text-center text-[9px] text-white">{i + 2}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">{lang === "tr" ? "Kapak görseli 1. sıra. Buraya 2–5. görselleri ekle." : "Cover image is #1. Add images 2–5 here."}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{lang === "tr" ? "🇹🇷 Türkçe Dosya (PDF, ZIP…)" : "🇹🇷 Turkish File (PDF, ZIP…)"}</Label>
             <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
-              <input
-                type="file"
-                accept=".pdf,.zip,.epub,.docx,.xlsx,.pptx,.mp4,.mp3,.png,.jpg,.jpeg,.gif,.svg,.ai,.psd,.figma"
-                className="hidden"
-                onChange={(e) => setDigitalFile(e.target.files?.[0] ?? null)}
-              />
+              <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileTr(e.target.files?.[0] ?? null)} />
               <FileUp className="h-4 w-4 shrink-0" />
               <span className="truncate">
-                {digitalFile ? digitalFile.name : (lang === "tr" ? "Dosya seç" : "Choose file")}
+                {digitalFileTr ? digitalFileTr.name : (editProduct?.file_url ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
               </span>
-              {digitalFile && (
-                <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
-                  {(digitalFile.size / 1024 / 1024).toFixed(1)} MB
-                </span>
-              )}
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{lang === "tr" ? "🇬🇧 İngilizce Dosya (PDF, ZIP…)" : "🇬🇧 English File (PDF, ZIP…)"}</Label>
+            <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
+              <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileEn(e.target.files?.[0] ?? null)} />
+              <FileUp className="h-4 w-4 shrink-0" />
+              <span className="truncate">
+                {digitalFileEn ? digitalFileEn.name : (editProduct?.file_url_en ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
+              </span>
             </label>
           </div>
 
@@ -281,7 +356,7 @@ function ProductModal({
           <Button variant="outline" onClick={onClose}>{lang === "tr" ? "İptal" : "Cancel"}</Button>
           <Button onClick={handleSave} disabled={loading} className="gap-2">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {lang === "tr" ? "Kaydet" : "Save"}
+            {isEdit ? (lang === "tr" ? "Güncelle" : "Update") : (lang === "tr" ? "Kaydet" : "Save")}
           </Button>
         </div>
       </div>
@@ -296,6 +371,7 @@ export default function ProductsPage() {
   const [filter, setFilter] = useState<ProductType | "all">("all");
   const [products, setProducts] = useState<Product[] | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [editProduct, setEditProduct] = useState<EditableProduct | undefined>(undefined);
   const [userPlan, setUserPlan] = useState<string>("starter");
 
   function load() {
@@ -338,8 +414,9 @@ export default function ProductsPage() {
     <>
       {showModal && (
         <ProductModal
-          onClose={() => setShowModal(false)}
-          onSaved={() => { setShowModal(false); load(); }}
+          onClose={() => { setShowModal(false); setEditProduct(undefined); }}
+          onSaved={() => { setShowModal(false); setEditProduct(undefined); load(); }}
+          editProduct={editProduct}
         />
       )}
 
@@ -429,7 +506,12 @@ export default function ProductsPage() {
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />{formatMoney(p.revenue)}</span>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1.5 px-2 text-muted-foreground">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1.5 px-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => { setEditProduct(p as unknown as EditableProduct); setShowModal(true); }}
+                      >
                         <Pencil className="h-3 w-3" /> {m.edit}
                       </Button>
                     </div>
