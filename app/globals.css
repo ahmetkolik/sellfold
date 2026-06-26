@@ -62,15 +62,15 @@
   /* Serif-italic accent ink — plum, complementary to coral. */
   --color-serif: oklch(52% 0.16 350);
 
-  /* Sidebar — deep warm plum-brown ink. The signature surface. */
-  --color-sidebar: oklch(24% 0.045 25);
-  --color-sidebar-foreground: oklch(95% 0.012 40);
-  --color-sidebar-muted: oklch(72% 0.025 35);
+  /* Sidebar — Dropcart navy, matches the logo background. */
+  --color-sidebar: oklch(21% 0.055 222);
+  --color-sidebar-foreground: oklch(95% 0.012 220);
+  --color-sidebar-muted: oklch(62% 0.03 215);
   --color-sidebar-active: oklch(66% 0.18 32);
-  --color-sidebar-border: oklch(34% 0.04 25);
+  --color-sidebar-border: oklch(29% 0.045 220);
 
   /* Signature gradients. */
-  --grad-brand: linear-gradient(140deg, oklch(72% 0.17 38) 0%, oklch(60% 0.2 18) 100%);
+  --grad-brand: linear-gradient(140deg, oklch(19% 0.07 228) 0%, oklch(25% 0.09 220) 55%, oklch(38% 0.12 210) 100%);
   --grad-hero: linear-gradient(135deg, oklch(98% 0.02 50) 0%, oklch(95% 0.06 38) 50%, oklch(94% 0.07 350) 100%);
 
   /* Four soft pastel tiles for KPI cards. Spread coral → plum → gold → mint. */
@@ -106,9 +106,9 @@
 
   --color-serif: oklch(74% 0.13 348);
 
-  --color-sidebar: oklch(15% 0.02 25);
-  --color-sidebar-foreground: oklch(93% 0.012 40);
-  --color-sidebar-border: oklch(27% 0.026 25);
+  --color-sidebar: oklch(14% 0.05 225);
+  --color-sidebar-foreground: oklch(93% 0.012 220);
+  --color-sidebar-border: oklch(22% 0.04 222);
 
   --grad-hero: linear-gradient(135deg, oklch(25% 0.035 35) 0%, oklch(23% 0.04 350) 100%);
 }

@@ -1,37 +1,23 @@
 import { cn } from "@/lib/utils";
 import appConfig from "@/app.config";
 
-/** Vitrin logomark — a storefront with a striped coral awning. */
+/** Dropcart logomark — shopping cart with striped basket on navy. */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 40 40" className={className} role="img" aria-label={appConfig.name}>
-      <defs>
-        <linearGradient id="vt-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ff9d6e" />
-          <stop offset="0.5" stopColor="#fb6f53" />
-          <stop offset="1" stopColor="#e84d6b" />
-        </linearGradient>
-        <linearGradient id="vt-awn" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff" />
-          <stop offset="1" stopColor="#ffe6d8" />
-        </linearGradient>
-      </defs>
-      <rect width="40" height="40" rx="11" fill="url(#vt-bg)" />
-      <rect width="40" height="40" rx="11" fill="#fff" opacity="0.06" />
-      {/* storefront body */}
-      <rect x="11" y="20" width="18" height="11" rx="1.6" fill="#fff" opacity="0.95" />
-      {/* door */}
-      <rect x="17.6" y="24" width="4.8" height="7" rx="0.8" fill="url(#vt-bg)" opacity="0.55" />
-      {/* awning canopy */}
-      <path d="M9.5 13 H30.5 a1.5 1.5 0 0 1 1.5 1.5 V19 H8 V14.5 A1.5 1.5 0 0 1 9.5 13 Z" fill="url(#vt-awn)" />
-      {/* awning stripes */}
-      <g fill="url(#vt-bg)" opacity="0.85">
-        <rect x="11" y="13" width="3.4" height="6" />
-        <rect x="17.8" y="13" width="3.4" height="6" />
-        <rect x="24.6" y="13" width="3.4" height="6" />
-      </g>
-      {/* scalloped awning edge */}
-      <path d="M8 19 q2 2.4 4 0 q2 2.4 4 0 q2 2.4 4 0 q2 2.4 4 0 q2 2.4 4 0 L32 19 Z" fill="url(#vt-awn)" />
+      <rect width="40" height="40" rx="10" fill="#1B2D3A" />
+      {/* handle arm */}
+      <path
+        d="M7.5 9.5 L12 9.5 L15.5 22 L28 22"
+        stroke="#EC9B78" strokeWidth="2.2" strokeLinecap="round"
+        strokeLinejoin="round" fill="none"
+      />
+      {/* basket stripes */}
+      <line x1="15" y1="13" x2="27" y2="13" stroke="#EC9B78" strokeWidth="2" strokeLinecap="round" />
+      <line x1="15.5" y1="17" x2="27.5" y2="17" stroke="#EC9B78" strokeWidth="2" strokeLinecap="round" />
+      {/* wheels */}
+      <circle cx="19" cy="26.5" r="2.2" fill="#EC9B78" />
+      <circle cx="26.5" cy="26.5" r="2.2" fill="#EC9B78" />
     </svg>
   );
 }
