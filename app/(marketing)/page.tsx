@@ -427,6 +427,15 @@ export default function MarketingPage() {
     supabase.from("products").select("id,title,type,price,emoji,hue,category_image_url,description,description_en").eq("live", true).limit(6)
       .then(({ data }) => setProducts((data ?? []) as Product[]));
     supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+
+    // Track page view
+    let sid = sessionStorage.getItem("_dsid");
+    if (!sid) { sid = Math.random().toString(36).slice(2); sessionStorage.setItem("_dsid", sid); }
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: "/", referrer: document.referrer, session_id: sid }),
+    }).catch(() => null);
   }, []);
 
   return (

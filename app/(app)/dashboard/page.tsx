@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   ArrowUpRight, Plus, TrendingUp, ShoppingBag, Wallet, Percent, Receipt,
   Zap, Crown, BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap,
-  Undo2, Banknote, Check, Filter,
+  Undo2, Banknote, Check, Filter, Eye, MousePointerClick, BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/components/i18n/language-provider";
@@ -45,6 +45,45 @@ function Sparkline({ data }: { data: number[] }) {
   );
 }
 
+type AnalyticsData = {
+  viewsByDay: { day: string; v: number }[];
+  clicksByDay: { day: string; v: number }[];
+  topPages: { path: string; count: number }[];
+  totalViews: number;
+  totalClicks: number;
+  todayViews: number;
+};
+
+function DualLine({ views, clicks }: { views: number[]; clicks: number[] }) {
+  const w = 400, h = 80;
+  const allVals = [...views, ...clicks];
+  const max = Math.max(...allVals, 1);
+  const pts = (data: number[], color: string) => {
+    const ps = data.map((v, i) => [(i / (data.length - 1)) * w, h - (v / max) * (h - 10) - 5] as [number, number]);
+    const line = ps.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ");
+    const area = `${line} L${w} ${h} L0 ${h} Z`;
+    return (
+      <>
+        <defs>
+          <linearGradient id={`grad-${color.slice(1)}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={color} stopOpacity="0.25" />
+            <stop offset="1" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={area} fill={`url(#grad-${color.slice(1)})`} />
+        <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={ps[ps.length - 1][0]} cy={ps[ps.length - 1][1]} r="3" fill={color} />
+      </>
+    );
+  };
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="h-[80px] w-full" preserveAspectRatio="none">
+      {pts(views, "var(--color-primary)")}
+      {pts(clicks, "#f97316")}
+    </svg>
+  );
+}
+
 function Cover({ hue, emoji, className = "" }: { hue: string; emoji: string; className?: string }) {
   return (
     <div
@@ -66,6 +105,11 @@ export default function VitrinDashboard() {
   const [revMonths, setRevMonths] = useState(demoRevMonths);
   const [hasRealData, setHasRealData] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+
+  useEffect(() => {
+    fetch("/api/analytics").then((r) => r.json()).then(setAnalytics).catch(() => null);
+  }, []);
 
   useEffect(() => {
     Promise.all([fetchProducts(), fetchOrders()]).then(([prods, orders]) => {
@@ -102,6 +146,9 @@ export default function VitrinDashboard() {
       deliveryLog: "Sipariş & teslimat kaydı", buyer: "Alıcı", product: "Ürün", amount: "Tutar",
       status: "Durum", delivered: "Teslim edildi", when: "Zaman", ofVisits: "ziyaretin",
       noSales: "Henüz satış yok", noProducts: "Henüz ürün yok",
+      analyticsT: "Site Analitiği", views14d: "14 günlük görüntülenme", today: "Bugün",
+      totalViews: "Toplam ziyaret", totalClicks: "Ürün tıklaması", topPagesT: "En çok ziyaret edilen",
+      analyticsEmpty: "Henüz ziyaretçi verisi yok",
     },
     en: {
       eyebrow: "Store · Today", hi: "Hello.", queueRest: "sales this month.",
@@ -120,6 +167,9 @@ export default function VitrinDashboard() {
       deliveryLog: "Order & delivery log", buyer: "Buyer", product: "Product", amount: "Amount",
       status: "Status", delivered: "Delivered", when: "When", ofVisits: "of visits",
       noSales: "No sales yet", noProducts: "No products yet",
+      analyticsT: "Site Analytics", views14d: "14-day views", today: "Today",
+      totalViews: "Total visits", totalClicks: "Product clicks", topPagesT: "Top pages",
+      analyticsEmpty: "No visitor data yet",
     },
   }[lang];
 
@@ -489,6 +539,92 @@ export default function VitrinDashboard() {
             </table>
           </div>
         )}
+      </section>
+
+      {/* ── Site Analytics ──────────────────────────────────────────── */}
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1.7fr_1fr]">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-semibold tracking-tight">{m.analyticsT}</h2>
+              <p className="text-sm text-muted-foreground">{m.views14d}</p>
+            </div>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary"><BarChart2 className="h-4 w-4" /></span>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-3">
+            <div className="rounded-xl bg-muted/50 p-3">
+              <Eye className="h-3.5 w-3.5 text-primary" />
+              <p className="mt-2 font-display text-xl font-semibold tabular-nums">{analytics?.totalViews ?? "—"}</p>
+              <p className="text-[11px] text-muted-foreground">{m.totalViews}</p>
+            </div>
+            <div className="rounded-xl bg-muted/50 p-3">
+              <Eye className="h-3.5 w-3.5 text-success" />
+              <p className="mt-2 font-display text-xl font-semibold tabular-nums">{analytics?.todayViews ?? "—"}</p>
+              <p className="text-[11px] text-muted-foreground">{m.today}</p>
+            </div>
+            <div className="rounded-xl bg-muted/50 p-3">
+              <MousePointerClick className="h-3.5 w-3.5 text-orange-500" />
+              <p className="mt-2 font-display text-xl font-semibold tabular-nums">{analytics?.totalClicks ?? "—"}</p>
+              <p className="text-[11px] text-muted-foreground">{m.totalClicks}</p>
+            </div>
+          </div>
+          {analytics && analytics.viewsByDay.length > 0 ? (
+            <div className="mt-4">
+              <DualLine
+                views={analytics.viewsByDay.map((d) => d.v)}
+                clicks={analytics.clicksByDay.map((d) => d.v)}
+              />
+              <div className="mt-2 flex items-center gap-4 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-4 rounded-full bg-primary" /> {m.totalViews}</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-4 rounded-full bg-orange-500" /> {m.totalClicks}</span>
+              </div>
+              <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                <span>{analytics.viewsByDay[0]?.day}</span>
+                <span>{analytics.viewsByDay[analytics.viewsByDay.length - 1]?.day}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6 flex flex-col items-center py-6 text-center text-muted-foreground">
+              <span className="text-3xl">📈</span>
+              <p className="mt-3 text-sm">{m.analyticsEmpty}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
+          <h2 className="font-display text-lg font-semibold tracking-tight">{m.topPagesT}</h2>
+          {analytics && analytics.topPages.length > 0 ? (
+            <ul className="mt-4 space-y-2.5">
+              {analytics.topPages.map((pg, i) => {
+                const maxCount = analytics.topPages[0]?.count || 1;
+                return (
+                  <li key={pg.path}>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="max-w-[160px] truncate font-medium">{pg.path || "/"}</span>
+                      <span className="shrink-0 tabular-nums text-muted-foreground">{pg.count}</span>
+                    </div>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${(pg.count / maxCount) * 100}%`,
+                          backgroundImage: i === 0
+                            ? "linear-gradient(90deg, var(--color-primary), var(--color-serif))"
+                            : `linear-gradient(90deg, color-mix(in oklch, var(--color-primary) ${80 - i * 15}%, transparent), color-mix(in oklch, var(--color-primary) ${50 - i * 10}%, transparent))`,
+                        }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="mt-6 flex flex-col items-center py-8 text-center text-muted-foreground">
+              <span className="text-3xl">🌐</span>
+              <p className="mt-3 text-sm">{m.analyticsEmpty}</p>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* ── Top customers ───────────────────────────────────────────── */}
