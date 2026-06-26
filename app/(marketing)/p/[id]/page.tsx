@@ -7,13 +7,13 @@ import {
   ArrowLeft, ShoppingCart, Shield, Zap, RotateCcw, Check, Star,
   BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Loader2,
   Download, FileText, Video, Key, Menu, X, LayoutDashboard,
+  Share2, Copy, CheckCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/logo";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useLang } from "@/components/i18n/language-provider";
 import appConfig from "@/app.config";
-import { formatMoney } from "@/lib/utils";
 
 type ProductType = "ebook" | "template" | "preset" | "course";
 
@@ -28,6 +28,8 @@ interface Product {
   category: string | null;
   category_image_url: string | null;
   gallery_images: string[] | null;
+  description: string | null;
+  description_en: string | null;
 }
 
 const typeIcon: Record<ProductType, typeof BookOpen> = {
@@ -126,6 +128,7 @@ export default function ProductPage() {
   const [claimSuccess, setClaimSuccess] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -141,7 +144,7 @@ export default function ProductPage() {
 
     supabase
       .from("products")
-      .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images")
+      .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images, description, description_en")
       .eq("id", id)
       .eq("live", true)
       .single()
@@ -151,7 +154,7 @@ export default function ProductPage() {
         setLoading(false);
         supabase
           .from("products")
-          .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images")
+          .select("id, title, type, price, hue, emoji, live, category, category_image_url, gallery_images, description, description_en")
           .eq("live", true)
           .neq("id", id)
           .limit(3)
@@ -387,10 +390,11 @@ export default function ProductPage() {
                 <span className="text-sm text-muted-foreground">· 128 {m.reviewsLabel}</span>
               </div>
 
-              {/* Price */}
-              <div className="mt-5 flex items-baseline gap-3">
-                <span className="font-display text-5xl font-bold tabular-nums text-primary">
-                  {formatMoney(product.price)}
+              {/* Plan access info */}
+              <div className="mt-4 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
+                  <Check className="h-3.5 w-3.5" />
+                  {lang === "tr" ? "Starter planıyla ücretsiz" : "Free with Starter plan"}
                 </span>
               </div>
             </div>
@@ -451,8 +455,62 @@ export default function ProductPage() {
                 })}
               </ul>
             </div>
+
+            {/* Social sharing */}
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h2 className="font-semibold tracking-tight mb-3 flex items-center gap-2">
+                <Share2 className="h-4 w-4 text-primary" />
+                {lang === "tr" ? "Arkadaşlarınla Paylaş" : "Share with Friends"}
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent((lang === "tr" ? `${product.title} - dijital ürünü gördün mü?` : `Check out ${product.title} — a great digital product!`) + " " + (typeof window !== "undefined" ? window.location.href : ""))}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
+                >
+                  𝕏 Twitter
+                </a>
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent((lang === "tr" ? `${product.title} dijital ürününe bak: ` : `Check out ${product.title}: `) + (typeof window !== "undefined" ? window.location.href : ""))}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
+                >
+                  💬 WhatsApp
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
+                >
+                  📘 Facebook
+                </a>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
+                >
+                  {copied ? <CheckCheck className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? (lang === "tr" ? "Kopyalandı!" : "Copied!") : (lang === "tr" ? "Link Kopyala" : "Copy Link")}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Description section */}
+        {(lang === "tr" ? product.description : product.description_en) && (
+          <div className="mt-12 border-t border-border pt-10">
+            <h2 className="font-display text-2xl font-semibold tracking-tight mb-5">
+              {lang === "tr" ? "Ürün Hakkında" : "About this product"}
+            </h2>
+            <div className="prose prose-sm max-w-none text-muted-foreground leading-relaxed whitespace-pre-line text-[15px]">
+              {lang === "tr" ? product.description : product.description_en}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Related products */}
@@ -481,7 +539,7 @@ export default function ProductPage() {
                       </span>
                       <p className="mt-1 truncate font-semibold">{p.title}</p>
                       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-                        <p className="font-display text-lg font-bold text-primary">{formatMoney(p.price)}</p>
+                        <span className="text-xs text-muted-foreground">{lang === "tr" ? "Starter ile ücretsiz" : "Free on Starter"}</span>
                         <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
                           <ShoppingCart className="h-3 w-3" /> {m.buy}
                         </span>

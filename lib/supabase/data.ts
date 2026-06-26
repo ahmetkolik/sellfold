@@ -3,7 +3,17 @@ import type { Product, Sale, Customer, ProductType } from "@/lib/demo/data";
 
 export type Order = Sale & { buyer_email: string };
 
-export async function fetchProducts(): Promise<Product[]> {
+export interface FullProduct extends Product {
+  category: string | null;
+  category_image_url: string | null;
+  file_url: string | null;
+  file_url_en: string | null;
+  gallery_images: string[];
+  description: string | null;
+  description_en: string | null;
+}
+
+export async function fetchProducts(): Promise<FullProduct[]> {
   const supabase = createClient();
   const { data } = await supabase
     .from("products")
@@ -20,6 +30,13 @@ export async function fetchProducts(): Promise<Product[]> {
     hue: p.hue ?? "220",
     emoji: p.emoji ?? "📦",
     live: p.live ?? false,
+    category: p.category ?? null,
+    category_image_url: p.category_image_url ?? null,
+    file_url: p.file_url ?? null,
+    file_url_en: p.file_url_en ?? null,
+    gallery_images: p.gallery_images ?? [],
+    description: p.description ?? null,
+    description_en: p.description_en ?? null,
     sales: Array.isArray(p.orders) ? p.orders.length : 0,
     revenue: Array.isArray(p.orders)
       ? p.orders.reduce((s: number, o: any) => s + Number(o.amount ?? 0), 0)

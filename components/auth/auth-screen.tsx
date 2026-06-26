@@ -55,6 +55,14 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
         options: { data: { full_name: fullName } },
       });
       if (err) { setError(err.message); setLoading(false); return; }
+      if (data.user) {
+        // Fire-and-forget welcome email
+        fetch("/api/welcome-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: fullName, email, lang }),
+        }).catch(() => {});
+      }
       if (data.user && !data.session) { setCheckEmail(true); setLoading(false); return; }
     } else {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });

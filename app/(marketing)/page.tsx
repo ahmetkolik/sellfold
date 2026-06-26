@@ -120,34 +120,62 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
+const HERO_3D_IMAGE = "https://d8j0ntlcm91z4.cloudfront.net/user_30XxtVGDxC1u9yMn0otLBrsAcLg/hf_20260625_190912_2de16b33-f1b7-418e-9092-201248e24ebb.png";
+
 function Hero() {
   const { t, lang } = useLang();
   return (
-    <section className="relative overflow-hidden" style={{ background: "var(--grad-hero)" }}>
-      <div className="blob h-96 w-96 -top-24 -right-24 bg-primary/20" />
-      <div className="blob h-64 w-64 -bottom-16 -left-16 bg-primary/10" />
-      <div className="relative mx-auto max-w-6xl px-4 py-20 lg:py-28 lg:px-8 text-center">
-        <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary mb-6">
-          {t(appConfig.marketing.badge)}
-        </span>
-        <h1 className="font-display text-[clamp(34px,6vw,68px)] font-semibold leading-[1.08] tracking-tight text-foreground">
-          {t(appConfig.marketing.heroTitle)}{" "}
-          <span className="display-accent">{t(appConfig.marketing.heroAccent)}</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[clamp(15px,2vw,18px)] leading-relaxed text-muted-foreground">
-          {t(appConfig.marketing.heroSubtitle)}
-        </p>
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a href="#products"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:opacity-90 transition-opacity">
-            <ShoppingCart className="h-5 w-5" />
-            {t(appConfig.marketing.heroCtaPrimary)}
-          </a>
-          <a href="#features"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-base font-semibold text-foreground hover:bg-muted transition-colors">
-            {t(appConfig.marketing.heroCtaSecondary)}
-            <ArrowRight className="h-4 w-4" />
-          </a>
+    <section className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #FBF7F2 0%, #F5ECE3 55%, #F0E4D8 100%)" }}>
+      {/* Warm decorative blobs */}
+      <div className="pointer-events-none absolute -top-16 -right-16 h-80 w-80 rounded-full bg-[#D96B4A]/12 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-12 -left-12 h-60 w-60 rounded-full bg-[#D96B4A]/8 blur-3xl" />
+
+      <div className="relative mx-auto max-w-6xl px-4 py-16 lg:py-24 lg:px-8">
+        <div className="grid lg:grid-cols-2 lg:items-center gap-12 lg:gap-8">
+          {/* Left: text + CTAs */}
+          <div>
+            <span className="inline-block rounded-full border border-[#D96B4A]/30 bg-[#D96B4A]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#D96B4A] mb-6">
+              {t(appConfig.marketing.badge)}
+            </span>
+            <h1 className="font-display text-[clamp(34px,5vw,62px)] font-semibold leading-[1.08] tracking-tight text-foreground">
+              {t(appConfig.marketing.heroTitle)}{" "}
+              <span className="display-accent">{t(appConfig.marketing.heroAccent)}</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-[clamp(15px,2vw,17px)] leading-relaxed text-muted-foreground">
+              {t(appConfig.marketing.heroSubtitle)}
+            </p>
+            <div className="mt-9 flex flex-col sm:flex-row items-start gap-3">
+              <a href="#products"
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white shadow-lg transition-opacity hover:opacity-90"
+                style={{ background: "linear-gradient(135deg, #D96B4A 0%, #A84330 100%)", boxShadow: "0 4px 24px #D96B4A44" }}>
+                <ShoppingCart className="h-5 w-5" />
+                {t(appConfig.marketing.heroCtaPrimary)}
+              </a>
+              <a href="#features"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-7 py-3.5 text-base font-semibold text-foreground hover:bg-white transition-colors">
+                {t(appConfig.marketing.heroCtaSecondary)}
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Right: 3D visual */}
+          <div className="relative flex items-center justify-center lg:justify-end">
+            <div className="relative w-full max-w-[440px]">
+              <div className="absolute inset-0 rounded-3xl bg-[#D96B4A]/15 blur-2xl scale-95 translate-y-4" />
+              <img
+                src={HERO_3D_IMAGE}
+                alt="Dropcart digital store"
+                className="relative w-full rounded-3xl shadow-2xl object-cover aspect-[4/3]"
+                style={{ boxShadow: "0 20px 60px #D96B4A22, 0 4px 20px rgba(0,0,0,0.15)" }}
+              />
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -left-4 rounded-2xl bg-white px-4 py-3 shadow-xl border border-border">
+                <p className="text-xs font-semibold text-foreground">🎉 {lang === "tr" ? "Anında teslimat" : "Instant delivery"}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{lang === "tr" ? "Ödeme → indirme linki" : "Payment → download link"}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -282,7 +310,7 @@ function Pricing() {
             {lang === "tr" ? "Senin için doğru plan" : "The right plan for you"}
           </h2>
         </div>
-        <div className="grid gap-5 lg:grid-cols-3 lg:items-start">
+        <div className="grid gap-5 lg:grid-cols-3 lg:items-stretch">
           {appConfig.marketing.pricing.map((tier) => (
             <div key={tier.name}
               className={`relative flex flex-col rounded-2xl border p-7 shadow-soft ${tier.featured ? "border-primary bg-primary/5 shadow-pop" : "border-border bg-card"}`}>
