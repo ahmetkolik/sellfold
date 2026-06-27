@@ -502,21 +502,11 @@ function Products({ products, lang }: { products: Product[]; lang: "tr" | "en" }
 }
 
 /* ── Pricing ─────────────────────────────────────────────────────────────── */
-function Pricing() {
+function Pricing({ isLoggedIn, isAuthLoading }: { isLoggedIn: boolean; isAuthLoading: boolean }) {
   const { t, lang } = useLang();
   const isTr = lang === "tr";
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [upgradeLoading, setUpgradeLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user);
-      setIsAuthLoading(false);
-    });
-  }, []);
 
   async function handlePlanCheckout(planId: string) {
     setUpgradeLoading(planId);
@@ -826,6 +816,7 @@ export default function MarketingPage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(STATIC_HERO_SLIDES);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
@@ -838,6 +829,7 @@ export default function MarketingPage() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setIsLoggedIn(!!user);
       setIsAdmin(!!user && ADMIN_EMAILS.includes(user.email ?? ""));
+      setIsAuthLoading(false);
     });
 
     let sid = sessionStorage.getItem("_dsid");
@@ -856,7 +848,7 @@ export default function MarketingPage() {
       <Stats />
       <Features />
       <Products products={products} lang={lang} />
-      <Pricing />
+      <Pricing isLoggedIn={isLoggedIn} isAuthLoading={isAuthLoading} />
       <FAQ />
       <CTABand />
       <Footer />
