@@ -83,6 +83,10 @@ export default function AccountPage() {
   const [purchases, setPurchases] = useState<PurchasedProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Upgrade state
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState<string | null>(null);
+
   // Profile editing
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState("");
@@ -148,6 +152,28 @@ export default function AccountPage() {
     const res = await fetch("/api/billing-portal", { method: "POST" });
     const { url } = await res.json();
     if (url) window.location.href = url;
+  }
+
+  async function handleUpgrade(planId: "creator" | "studio") {
+    setUpgradeLoading(true);
+    setUpgradeError(null);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setUpgradeError(data.error ?? (isTr ? "Bir hata oluştu, tekrar deneyin." : "Something went wrong, please try again."));
+        setUpgradeLoading(false);
+      }
+    } catch {
+      setUpgradeError(isTr ? "Bağlantı hatası, tekrar deneyin." : "Connection error, please try again.");
+      setUpgradeLoading(false);
+    }
   }
 
   async function handleSaveName() {
@@ -294,16 +320,24 @@ export default function AccountPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-2 shrink-0">
+              <div className="flex flex-col gap-2 shrink-0">
                 {plan !== "studio" && (
-                  <Link
-                    href="/#pricing"
-                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ background: PLAN_GRADIENT.creator, boxShadow: "0 4px 14px oklch(66% 0.18 32 / .3)" }}
-                  >
-                    <Zap className="h-3.5 w-3.5" />
-                    {isTr ? "Planı Yükselt" : "Upgrade Plan"}
-                  </Link>
+                  <>
+                    <button
+                      onClick={() => handleUpgrade(plan === "starter" ? "creator" : "studio")}
+                      disabled={upgradeLoading}
+                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                      style={{ background: PLAN_GRADIENT.creator, boxShadow: "0 4px 14px oklch(66% 0.18 32 / .3)" }}
+                    >
+                      {upgradeLoading
+                        ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />{isTr ? "Yönlendiriliyor..." : "Redirecting..."}</>
+                        : <><Zap className="h-3.5 w-3.5" />{isTr ? (plan === "starter" ? "Creator'a Geç →" : "Studio'ya Geç →") : (plan === "starter" ? "Upgrade to Creator →" : "Upgrade to Studio →")}</>
+                      }
+                    </button>
+                    {upgradeError && (
+                      <p className="text-xs text-destructive text-center max-w-[200px]">{upgradeError}</p>
+                    )}
+                  </>
                 )}
                 {profile.stripeCustomerId && (
                   <button
@@ -408,11 +442,13 @@ export default function AccountPage() {
                   <p className="text-xs text-muted-foreground">
                     {isTr ? "Kotanı doldurdun! Daha fazla ürün için yükselt." : "Quota full! Upgrade for more products."}
                   </p>
-                  <Link href="/#pricing"
-                    className="text-xs font-semibold underline underline-offset-2"
+                  <button
+                    onClick={() => handleUpgrade(plan === "starter" ? "creator" : "studio")}
+                    disabled={upgradeLoading}
+                    className="text-xs font-semibold underline underline-offset-2 disabled:opacity-60"
                     style={{ color: PLAN_COLOR.creator }}>
                     {isTr ? "Yükselt" : "Upgrade"}
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -556,11 +592,13 @@ export default function AccountPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">{isTr ? "Plan" : "Plan"}</span>
                     {plan !== "studio" && (
-                      <Link href="/#pricing"
-                        className="text-xs font-medium underline underline-offset-2"
+                      <button
+                        onClick={() => handleUpgrade(plan === "starter" ? "creator" : "studio")}
+                        disabled={upgradeLoading}
+                        className="text-xs font-medium underline underline-offset-2 disabled:opacity-60"
                         style={{ color: PLAN_COLOR.creator }}>
                         {isTr ? "Yükselt" : "Upgrade"}
-                      </Link>
+                      </button>
                     )}
                   </div>
                   <div className="mt-1 flex items-center gap-2">

@@ -505,26 +505,37 @@ function Products({ products, lang }: { products: Product[]; lang: "tr" | "en" }
 function Pricing() {
   const { t, lang } = useLang();
   const isTr = lang === "tr";
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [upgradeLoading, setUpgradeLoading] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+      setIsAuthLoading(false);
+    });
   }, []);
 
   async function handlePlanCheckout(planId: string) {
     setUpgradeLoading(planId);
+    setCheckoutError(null);
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: planId }),
       });
-      const { url } = await res.json();
-      if (url) window.location.href = url;
-      else setUpgradeLoading(null);
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error ?? (isTr ? "Bir hata oluştu, tekrar deneyin." : "Something went wrong, please try again."));
+        setUpgradeLoading(null);
+      }
     } catch {
+      setCheckoutError(isTr ? "Bağlantı hatası, tekrar deneyin." : "Connection error, please try again.");
       setUpgradeLoading(null);
     }
   }
@@ -583,7 +594,15 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              {isLoggedIn && isPaid ? (
+              {isAuthLoading ? (
+                <div
+                  className="mt-5 flex items-center justify-center rounded-full px-5 py-3.5 opacity-40 animate-pulse"
+                  style={tier.featured
+                    ? { background: "oklch(66% 0.18 32)" }
+                    : { background: "var(--color-sidebar)" }}>
+                  <div className="h-4 w-24 rounded-full bg-white/40" />
+                </div>
+              ) : isLoggedIn && isPaid ? (
                 <button
                   onClick={() => handlePlanCheckout(planId)}
                   disabled={!!upgradeLoading}
@@ -614,6 +633,9 @@ function Pricing() {
             </div>
           )})}
         </div>
+        {checkoutError && (
+          <p className="mt-4 text-center text-sm text-destructive">{checkoutError}</p>
+        )}
       </div>
     </section>
   );

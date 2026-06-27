@@ -469,6 +469,723 @@ const PRODUCTS: Array<{
       ],
     },
   },
+
+  // ── Canva Sosyal Medya Paketi ──────────────────────────────────────────────
+  {
+    id: "e383277d-2532-4e89-8fa4-14dce790f3e3",
+    titleTr: "Canva Sosyal\nMedya Paketi",
+    titleEn: "Canva Social\nMedia Pack",
+    type: "Şablon · Koleksiyon",
+    emoji: "🎨",
+    fileSlugTr: "canva-guide-tr.pdf",
+    fileSlugEn: "canva-guide-en.pdf",
+    sections: {
+      tr: [
+        {
+          heading: "Pakete Erişim",
+          body: "Paket, 50+ hazır Canva şablonu içerir. Tüm şablonlar düzenlenebilir ve marka renklerinize uyarlanabilir.",
+          steps: [
+            "E-postanızdaki bağlantıya tıklayarak Canva'ya gidin",
+            "Şablonu kopyalamak için 'Bu şablonu kullan' butonuna basın",
+            "Canva hesabınıza otomatik olarak eklenir",
+            "Metin, renk ve görselleri kendi markanıza göre değiştirin",
+          ],
+          tip: "Ücretsiz Canva hesabıyla tüm şablonları kullanabilirsiniz.",
+        },
+        {
+          heading: "Instagram Gönderileri",
+          body: "1:1 kare ve 4:5 dikey formatlarda hazır tasarımlar. Feed tutarlılığı için renk paletleri dahildir.",
+          steps: [
+            "Şablonu açın ve metni kendi mesajınızla değiştirin",
+            "Arka plan rengini marka renginizle değiştirin",
+            "Görseli kendi fotoğrafınızla değiştirin (opsiyonel)",
+            "PNG veya JPG olarak 1080x1080px indirin",
+          ],
+        },
+        {
+          heading: "Instagram & TikTok Story",
+          body: "9:16 dikey formatta hazır Story şablonları. Dikkat çekici animasyon fikirleri dahildir.",
+          steps: [
+            "Story şablonunu seçin (9:16 format)",
+            "Metni ve CTA butonunu güncelleyin",
+            "Arka planı markanıza göre özelleştirin",
+            "Canva üzerinden animasyon ekleyebilirsiniz",
+          ],
+          tip: "Story'ler için metni kısa tutun, maksimum 7 kelime önerilir.",
+        },
+        {
+          heading: "LinkedIn Gönderi Tasarımı",
+          body: "Profesyonel görünümlü LinkedIn gönderileri için özel şablonlar. Karousel ve tekli gönderi formatları.",
+          steps: [
+            "LinkedIn şablonunu seçin (1200x627px veya 1080x1080px)",
+            "Başlık metnini 5 kelimeyi aşmayacak şekilde yazın",
+            "Marka logonuzu sol üst köşeye yerleştirin",
+            "LinkedIn mavi tonlarını veya marka renginizi kullanın",
+          ],
+        },
+        {
+          heading: "Renk & Yazı Tipi Özelleştirme",
+          body: "Tüm şablonlar marka kılavuzunuza uyarlanabilir. Canva'nın Brand Kit özelliğini kullanın.",
+          steps: [
+            "Sol menüden Brand Kit seçeneğine gidin",
+            "Logonuzu ve renk paletinizi yükleyin",
+            "Kullandığınız yazı tiplerini ekleyin",
+            "Şablonu açtığınızda marka renkleri otomatik uygulanır",
+          ],
+          tip: "Pro hesap olmadan da Brand Kit özelliğinin bazı özellikleri ücretsiz kullanılabilir.",
+        },
+        {
+          heading: "İçerik Takvimi & Planlama",
+          body: "Pakete ek olarak aylık içerik takvimi şablonu dahildir. Hangi günlerde ne paylaşacağınızı planlayın.",
+          steps: [
+            "İçerik takvimi şablonunu açın",
+            "Haftalık tema ve konularınızı doldurun",
+            "Her gün için şablon numarası not edin",
+            "Canva Scheduler ile gönderileri planlayın (Pro)",
+          ],
+        },
+      ],
+      en: [
+        {
+          heading: "Accessing the Pack",
+          body: "The pack includes 50+ ready-to-use Canva templates. All templates are editable and adaptable to your brand colors.",
+          steps: [
+            "Click the link in your email to open Canva",
+            "Press 'Use this template' to copy it to your account",
+            "The template is automatically added to your Canva library",
+            "Change text, colors, and visuals to match your brand",
+          ],
+          tip: "All templates work with a free Canva account.",
+        },
+        {
+          heading: "Instagram Feed Posts",
+          body: "Ready-made designs in 1:1 square and 4:5 portrait formats. Matching color palettes included.",
+          steps: [
+            "Open the template and replace the text with your message",
+            "Change the background color to your brand color",
+            "Replace the image with your own photo (optional)",
+            "Download as PNG or JPG at 1080x1080px",
+          ],
+        },
+        {
+          heading: "Instagram & TikTok Stories",
+          body: "Ready-made story templates in 9:16 vertical format. Attention-grabbing animation ideas included.",
+          steps: [
+            "Select a story template (9:16 format)",
+            "Update the text and CTA button",
+            "Customize the background to match your brand",
+            "Add animations via Canva's animation tool",
+          ],
+          tip: "Keep story text short, a maximum of 7 words is recommended.",
+        },
+        {
+          heading: "LinkedIn Post Design",
+          body: "Professional LinkedIn post templates. Carousel and single-post formats available.",
+          steps: [
+            "Select a LinkedIn template (1200x627px or 1080x1080px)",
+            "Write your headline, keep it under 5 words",
+            "Place your brand logo in the top-left corner",
+            "Use LinkedIn blue tones or your brand color",
+          ],
+        },
+        {
+          heading: "Color & Font Customization",
+          body: "All templates can be adapted to your brand guidelines. Use Canva's Brand Kit feature.",
+          steps: [
+            "Go to Brand Kit in the left menu",
+            "Upload your logo and color palette",
+            "Add your brand fonts",
+            "Brand colors are automatically applied when you open a template",
+          ],
+          tip: "Some Brand Kit features are available for free without a Pro account.",
+        },
+        {
+          heading: "Content Calendar & Planning",
+          body: "A monthly content calendar template is included. Plan which posts to share on which days.",
+          steps: [
+            "Open the content calendar template",
+            "Fill in your weekly themes and topics",
+            "Note the template number for each day",
+            "Use Canva Scheduler to plan posts in advance (Pro)",
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── ChatGPT Mega Prompt Paketi ─────────────────────────────────────────────
+  {
+    id: "5cd199e1-4bd1-4131-b95a-7bdd120e9802",
+    titleTr: "ChatGPT Mega\nPrompt Paketi",
+    titleEn: "ChatGPT Mega\nPrompt Pack",
+    type: "Koleksiyon · Şablon",
+    emoji: "🤖",
+    fileSlugTr: "chatgpt-guide-tr.pdf",
+    fileSlugEn: "chatgpt-guide-en.pdf",
+    sections: {
+      tr: [
+        {
+          heading: "Paketi Nasıl Kullanırsın",
+          body: "300+ kategorilendirilmiş ChatGPT promptu. [ ] içindeki kısımları kendi değerlerinizle doldurun.",
+          steps: [
+            "Istediğiniz kategoriyi bulun (içerik, e-posta, satış vb.)",
+            "Promptu kopyalayın",
+            "[ ] kısımlarını kendi bilgilerinizle değiştirin",
+            "ChatGPT'ye yapıştırın ve yanıtı alın",
+          ],
+          tip: "GPT-4 veya GPT-4o ile en iyi sonuçları alırsınız.",
+        },
+        {
+          heading: "Içerik Üretimi",
+          body: "Blog yazısı, sosyal medya, video script için en çok kullanılan promptlar:",
+          steps: [
+            '"[konu] hakkında SEO uyumlu 1000 kelimelik blog yazısı yaz"',
+            '"[ürün] için Instagram caption, emoji ve hashtag dahil"',
+            '"[sektör] için YouTube video scripti, kanca ile başla"',
+            '"[marka] için 30 günlük içerik takvimi oluştur"',
+          ],
+        },
+        {
+          heading: "Satış & Pazarlama",
+          body: "Dönüşüm oranını artıran satış odaklı promptlar:",
+          steps: [
+            '"[ürün] için AIDA formatında satış metni yaz"',
+            '"[hedef kitle] için e-posta bülteni, konu satırı dahil"',
+            '"[rakip] ile kıyaslamalı ürün analizi yap"',
+            '"[landing page] için 5 farklı başlık öner"',
+          ],
+          tip: "Promptları zincirleme kullanın: birinin çıktısını diğerine girin.",
+        },
+        {
+          heading: "Müşteri Hizmetleri",
+          body: "Profesyonel ve empatik yanıt promptları:",
+          steps: [
+            '"[şikayet] için özür e-postası yaz, çözüm öner"',
+            '"[soru] için SSS cevabı, sade ve net"',
+            '"Kızgın müşteriyi sakinleştiren yanıt yaz"',
+            '"Geri iade talebi için politika açıklaması"',
+          ],
+        },
+        {
+          heading: "Proje & Strateji",
+          body: "İş planı, strateji ve analiz promptları:",
+          steps: [
+            '"[iş fikri] için SWOT analizi yap"',
+            '"[proje] için 30-60-90 günlük plan oluştur"',
+            '"[sektör] için rakip analizi, 5 rakip"',
+            '"Startup için pitch deck ana hatları"',
+          ],
+        },
+        {
+          heading: "Verimlilik Ipuçları",
+          body: "Promptlardan maksimum verim almak için teknikler:",
+          steps: [
+            "Rol ver: Uzman bir [meslek] gibi yanıt ver",
+            "Çıktı formatı belirt: tablo, madde, kod bloğu",
+            "Uzunluk sınırla: 200 kelimeden fazla olmasın",
+            "Örnek ver: şu formatta yaz diyerek örnek gösterin",
+          ],
+          tip: "Aynı konuyu 3 farklı prompt ile deneyin, en iyisini seçin.",
+        },
+      ],
+      en: [
+        {
+          heading: "How to Use the Pack",
+          body: "300+ categorized ChatGPT prompts. Fill in the [ ] placeholders with your specific values.",
+          steps: [
+            "Find the category you need (content, email, sales, etc.)",
+            "Copy the prompt",
+            "Replace the [ ] placeholders with your information",
+            "Paste into ChatGPT and get your result",
+          ],
+          tip: "Best results with GPT-4 or GPT-4o.",
+        },
+        {
+          heading: "Content Creation",
+          body: "The most-used prompts for blog posts, social media, and video scripts:",
+          steps: [
+            '"Write a 1000-word SEO-optimized blog post about [topic]"',
+            '"Instagram caption for [product], include emojis and hashtags"',
+            '"YouTube video script for [industry], start with a hook"',
+            '"Create a 30-day content calendar for [brand]"',
+          ],
+        },
+        {
+          heading: "Sales & Marketing",
+          body: "Conversion-focused prompts to boost sales:",
+          steps: [
+            '"Write sales copy for [product] in AIDA format"',
+            '"Email newsletter for [target audience], include subject line"',
+            '"Comparative product analysis vs [competitor]"',
+            '"Suggest 5 different headlines for [landing page]"',
+          ],
+          tip: "Chain prompts: feed the output of one into the next.",
+        },
+        {
+          heading: "Customer Service",
+          body: "Professional and empathetic response prompts:",
+          steps: [
+            '"Write an apology email for [complaint] and offer a solution"',
+            '"FAQ answer for [question], clear and concise"',
+            '"Write a response that calms an angry customer"',
+            '"Policy explanation for a refund request"',
+          ],
+        },
+        {
+          heading: "Project & Strategy",
+          body: "Business planning, strategy, and analysis prompts:",
+          steps: [
+            '"Do a SWOT analysis for [business idea]"',
+            '"Create a 30-60-90 day plan for [project]"',
+            '"Competitor analysis for [industry], 5 competitors"',
+            '"Pitch deck outline for a startup"',
+          ],
+        },
+        {
+          heading: "Productivity Tips",
+          body: "Techniques to get the most out of your prompts:",
+          steps: [
+            "Assign a role: Respond as an expert [profession]",
+            "Specify output format: table, bullet points, code block",
+            "Limit length: No more than 200 words",
+            "Give an example: write in this format and show a sample",
+          ],
+          tip: "Try the same topic with 3 different prompts, pick the best result.",
+        },
+      ],
+    },
+  },
+
+  // ── Viral İçerik Üretme Rehberi ───────────────────────────────────────────
+  {
+    id: "573792c0-9df4-450a-97d1-47bb874c5fe5",
+    titleTr: "Viral İçerik\nÜretme Rehberi",
+    titleEn: "Viral Content\nCreation Guide",
+    type: "Kılavuz · E-Kitap",
+    emoji: "🚀",
+    fileSlugTr: "viral-guide-tr.pdf",
+    fileSlugEn: "viral-guide-en.pdf",
+    sections: {
+      tr: [
+        {
+          heading: "Viral İçerik Psikolojisi",
+          body: "Viral olan içerikler 6 temel duygudan birini tetikler: şaşkınlık, sevinç, öfke, korku, üzüntü veya tiksinti.",
+          steps: [
+            "İçeriğinizin hangi duyguyu hedeflediğini belirleyin",
+            "Başlık ve kanca o duyguyu ilk 3 saniyede vermelidir",
+            "Paylaşma motivasyonu yaratın: Bu arkadaşlarını yansıtıyor",
+            "Kimlik ile bağ kurun: Bunu bilen biri paylaşır",
+          ],
+          tip: "Şaşkınlık duygusu en yüksek paylaşım oranını üretir.",
+        },
+        {
+          heading: "Hook Formula - İlk 3 Saniye",
+          body: "İzleyicinin karar anı ilk 3 saniyedir. Kanca olmadan içerik viral olmaz.",
+          steps: [
+            "Soru formatı: Neden [beklenmedik durum] oluyor?",
+            "İddia formatı: [Rakam] kişi bunu hala bilmiyor",
+            "Zıt formatı: Herkesin yaptığı şey aslında yanlış",
+            "Hikaye formatı: Geçen hafta [sürpriz] oldu ve şimdi...",
+          ],
+          tip: "İlk kareye merak uyandıran bir görsel veya metin koyun.",
+        },
+        {
+          heading: "Platform Algoritmaları",
+          body: "Her platformun algoritması farklı sinyalleri önceliklendirir. Doğru strateji platform bazlı değişir.",
+          steps: [
+            "TikTok: izlenme süresi ve yeniden izleme oranı önceliklidir",
+            "Instagram Reels: kaydetme ve paylaşma en güçlü sinyaldir",
+            "YouTube Shorts: tıklama oranı ve izleme tamamlama kritiktir",
+            "LinkedIn: yorum kalitesi ve bekleme süresi önemlidir",
+          ],
+        },
+        {
+          heading: "İçerik Formatları",
+          body: "2024-2025'te en yüksek erişim sağlayan içerik formatları:",
+          steps: [
+            "Öğretici içerik: X adımda Y nasıl yapılır",
+            "Transformation: Öncesi vs Sonrası formatı",
+            "Tartışma: Herkes X yapar, ben Y yaparım (işte neden)",
+            "Günlük vlog: Bir günümde neler oluyor",
+          ],
+          tip: "Seriler tek videolardan daha fazla takipçi kazandırır.",
+        },
+        {
+          heading: "SEO & Hashtag Stratejisi",
+          body: "Doğru anahtar kelime ve hashtag seçimi organik erişimi 10 kat artırabilir.",
+          steps: [
+            "Nişinizde 3-5 orta rekabetli hashtag kullanın",
+            "Başlık ve açıklamaya anahtar kelimeyi doğal yerleştirin",
+            "TikTok aramasında nişinizi araştırın",
+            "İlk yorum olarak ek hashtag ekleyin",
+          ],
+        },
+        {
+          heading: "Analiz & Optimizasyon",
+          body: "Veriye dayalı içerik stratejisi için temel metrikler:",
+          steps: [
+            "İzlenme süresi oranı: hedef yüzde 50 üzeri",
+            "Kaydetme oranı: yüzde 2 üzeri güçlü sinyal",
+            "Paylaşma ve görüntülenme oranını haftalık takip edin",
+            "En iyi 3 içeriğinizi analiz edip benzerlerini üretin",
+          ],
+          tip: "En iyi performans gösteren içeriğinizi formüle dönüştürün.",
+        },
+      ],
+      en: [
+        {
+          heading: "Psychology of Viral Content",
+          body: "Viral content triggers one of 6 core emotions: awe, joy, anger, fear, sadness, or disgust.",
+          steps: [
+            "Identify which emotion your content targets",
+            "Your hook and headline must deliver that emotion in 3 seconds",
+            "Create a sharing motivation: This perfectly describes my friend",
+            "Build identity connection: Someone who knows this will share it",
+          ],
+          tip: "Awe produces the highest share rates of any emotion.",
+        },
+        {
+          heading: "Hook Formula - First 3 Seconds",
+          body: "The viewer's decision happens in the first 3 seconds. No hook means no virality.",
+          steps: [
+            "Question format: Why does [unexpected thing] happen?",
+            "Claim format: [Number] people still do not know this",
+            "Contrarian format: What everyone does is actually wrong",
+            "Story format: Last week [surprise] happened and now...",
+          ],
+          tip: "Put a curiosity-driving visual or text in the first frame.",
+        },
+        {
+          heading: "Platform Algorithms",
+          body: "Each platform's algorithm prioritizes different signals. The right strategy changes by platform.",
+          steps: [
+            "TikTok: watch time and rewatch rate are top priorities",
+            "Instagram Reels: saves and shares are the strongest signals",
+            "YouTube Shorts: click-through rate and completion rate are critical",
+            "LinkedIn: comment quality and dwell time matter most",
+          ],
+        },
+        {
+          heading: "Content Formats",
+          body: "The highest-reach content formats of 2024-2025:",
+          steps: [
+            "Tutorial: How to do Y in X steps",
+            "Transformation: Before vs After format",
+            "Contrarian: Everyone does X, I do Y and here is why",
+            "Daily vlog: What happens in my typical day",
+          ],
+          tip: "Series earn more followers than standalone videos.",
+        },
+        {
+          heading: "SEO & Hashtag Strategy",
+          body: "The right keywords and hashtags can multiply organic reach by 10x.",
+          steps: [
+            "Use 3-5 medium-competition hashtags in your niche",
+            "Naturally include your keyword in the title and description",
+            "Research your niche in TikTok search",
+            "Add extra hashtags as the first comment",
+          ],
+        },
+        {
+          heading: "Analytics & Optimization",
+          body: "Key metrics for a data-driven content strategy:",
+          steps: [
+            "Watch time rate: target above 50 percent",
+            "Save rate: above 2 percent is a strong signal",
+            "Track your share-to-view ratio weekly",
+            "Analyze your top 3 posts and produce similar content",
+          ],
+          tip: "Turn your best-performing content into a repeatable formula.",
+        },
+      ],
+    },
+  },
+
+  // ── E-Ticaret Finansal Tracker ─────────────────────────────────────────────
+  {
+    id: "5d3c4e5d-29e9-4352-b962-677545ef67f1",
+    titleTr: "E-Ticaret\nFinansal Tracker",
+    titleEn: "E-Commerce\nFinancial Tracker",
+    type: "Şablon · Araç",
+    emoji: "📊",
+    fileSlugTr: "eticaret-guide-tr.pdf",
+    fileSlugEn: "eticaret-guide-en.pdf",
+    sections: {
+      tr: [
+        {
+          heading: "Şablona Erişim & Kurulum",
+          body: "E-Ticaret Finansal Tracker, Google Sheets şablonudur. Google hesabınıza kopyalayarak hemen kullanmaya başlayabilirsiniz.",
+          steps: [
+            "Paylaşılan bağlantıyı açın",
+            "Sağ üst köşeden Kopyasını Oluştur seçeneğine tıklayın",
+            "Şablonu Google Drive'ınıza kaydedin",
+            "Sarı hücrelerden kendi bilgilerinizi girmeye başlayın",
+          ],
+          tip: "Formülleri değiştirmeyin, yalnızca sarı renkli hücrelere veri girin.",
+        },
+        {
+          heading: "Ürün & Maliyet Analizi",
+          body: "Ürün karlılığını doğru hesaplamak için tüm maliyetleri girmelisiniz.",
+          steps: [
+            "Ürün adı ve satış fiyatını girin",
+            "Tedarik maliyetini KDV dahil girin",
+            "Kargo ve ambalaj maliyetini ekleyin",
+            "Platform komisyonunu yüzde olarak girin",
+          ],
+        },
+        {
+          heading: "Satış Takibi",
+          body: "Günlük, haftalık ve aylık satış verilerinizi takip edin:",
+          steps: [
+            "Her satışı tarih ve platform bilgisiyle girin",
+            "Satış Takibi sekmesine sipariş numarasını ekleyin",
+            "İptal ve iade satışlarını işaretleyin",
+            "Haftalık özet otomatik hesaplanır",
+          ],
+          tip: "Her gün 5 dakika ayırarak verileri güncel tutun.",
+        },
+        {
+          heading: "Gider Yönetimi",
+          body: "Sabit ve değişken giderleri ayrı takip edin:",
+          steps: [
+            "Sabit giderler: reklam paketi, depo kirası, abonelikler",
+            "Değişken giderler: reklam harcaması, iade kargo bedeli",
+            "Gider kategorisini belirleyin: pazarlama, operasyon vb.",
+            "Aylık gider raporu otomatik oluşturulur",
+          ],
+        },
+        {
+          heading: "Karlılık Dashboard",
+          body: "Tüm veriler otomatik olarak ana dashboard'a yansır. Anlık kar ve zarar görebilirsiniz.",
+          steps: [
+            "Dashboard sekmesini açın",
+            "Aylık brüt kar ve net kar otomatik hesaplanır",
+            "Ürün bazlı karlılık grafiğini inceleyin",
+            "En karlı ve en zararlı ürünleri belirleyin",
+          ],
+          tip: "Net kar marjınız yüzde 20'nin altına düştüğünde uyarı ikonu görünür.",
+        },
+        {
+          heading: "Vergi & Muhasebe",
+          body: "Muhasebecimize verecekleriniz için hazır raporlar:",
+          steps: [
+            "Aylık gelir özeti sekmesini açın",
+            "KDV hesaplamalarını inceleyin",
+            "Üç aylık raporu PDF olarak dışa aktarın",
+            "Gider faturalarını Belgeler sütununa not edin",
+          ],
+        },
+      ],
+      en: [
+        {
+          heading: "Accessing & Setting Up",
+          body: "The E-Commerce Financial Tracker is a Google Sheets template. Copy it to your Google account and start right away.",
+          steps: [
+            "Open the shared link",
+            "Click Make a copy in the top-right corner",
+            "Save the template to your Google Drive",
+            "Start entering your data in the yellow-highlighted cells",
+          ],
+          tip: "Do not modify formulas, enter data only in the yellow cells.",
+        },
+        {
+          heading: "Product & Cost Analysis",
+          body: "To accurately calculate product profitability, enter all costs:",
+          steps: [
+            "Enter the product name and selling price",
+            "Enter the supply cost including tax",
+            "Add shipping and packaging costs",
+            "Enter the platform commission as a percentage",
+          ],
+        },
+        {
+          heading: "Sales Tracking",
+          body: "Track your daily, weekly, and monthly sales data:",
+          steps: [
+            "Enter each sale with the date and platform",
+            "Add order numbers to the Sales Tracking tab",
+            "Mark cancelled and returned orders",
+            "Weekly summaries are calculated automatically",
+          ],
+          tip: "Spend 5 minutes each day keeping data current.",
+        },
+        {
+          heading: "Expense Management",
+          body: "Track fixed and variable expenses separately:",
+          steps: [
+            "Fixed costs: ad packages, warehouse rent, subscriptions",
+            "Variable costs: ad spend, return shipping fees",
+            "Assign an expense category: marketing, operations, etc.",
+            "Monthly expense reports are generated automatically",
+          ],
+        },
+        {
+          heading: "Profitability Dashboard",
+          body: "All data reflects automatically in the main dashboard. See profit and loss in real time.",
+          steps: [
+            "Open the Dashboard tab",
+            "Monthly gross and net profit are calculated automatically",
+            "Review the product-level profitability chart",
+            "Identify your most and least profitable products",
+          ],
+          tip: "A warning icon appears when your net profit margin drops below 20 percent.",
+        },
+        {
+          heading: "Tax & Accounting",
+          body: "Ready-made reports to hand to your accountant:",
+          steps: [
+            "Open the Monthly Income Summary tab",
+            "Review the VAT calculations",
+            "Export the quarterly report as a PDF",
+            "Note expense receipts in the Documents column",
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── Freelancer Notion CRM Şablonu ─────────────────────────────────────────
+  {
+    id: "b366a630-a3e4-4f10-92f6-d068e86693b2",
+    titleTr: "Freelancer\nNotion CRM",
+    titleEn: "Freelancer\nNotion CRM",
+    type: "Şablon · Araç",
+    emoji: "🗂️",
+    fileSlugTr: "freelancer-guide-tr.pdf",
+    fileSlugEn: "freelancer-guide-en.pdf",
+    sections: {
+      tr: [
+        {
+          heading: "Şablonu Kopyalama",
+          body: "Notion CRM şablonu, Notion hesabınıza tek tıkla kopyalanır. Ücretsiz Notion hesabı yeterlidir.",
+          steps: [
+            "E-postanızdaki Notion şablon bağlantısını açın",
+            "Sağ üst köşeden Duplicate butonuna tıklayın",
+            "Şablon çalışma alanınıza kopyalanır",
+            "My CRM adıyla kaydedin ve düzenlemeye başlayın",
+          ],
+          tip: "Notion Mobile uygulamasıyla her yerden erişebilirsiniz.",
+        },
+        {
+          heading: "Müşteri Veritabanı",
+          body: "Tüm mevcut ve potansiyel müşterilerinizi tek bir veritabanında yönetin.",
+          steps: [
+            "Müşteri adı ve iletişim bilgilerini girin",
+            "Durum etiketini belirleyin: Potansiyel, Aktif, Tamamlandı",
+            "Sektör ve bütçe aralığını ekleyin",
+            "İlk görüşme tarihini not edin",
+          ],
+        },
+        {
+          heading: "Proje & Görev Takibi",
+          body: "Her müşteriyle bağlantılı projelerinizi ve görevlerinizi takip edin:",
+          steps: [
+            "Müşteri sayfasından Proje Ekle butonuna basın",
+            "Proje adı, bütçe ve teslim tarihini girin",
+            "Görevleri alt bölümlere ekleyin",
+            "Tamamlanma yüzdesini güncelleyin",
+          ],
+          tip: "Proje görünümünü Kanban veya Timeline olarak değiştirebilirsiniz.",
+        },
+        {
+          heading: "Teklif & Fatura Takibi",
+          body: "Gönderilen teklifleri ve faturaları aynı yerden yönetin:",
+          steps: [
+            "Teklif durumunu seçin: Taslak, Gönderildi, Kabul, Reddedildi",
+            "Teklif tutarı ve tarihini girin",
+            "Fatura oluşturulduğunda durumu güncelleyin",
+            "Ödeme tarihini ve tutarı not edin",
+          ],
+        },
+        {
+          heading: "İletişim Geçmişi",
+          body: "Her müşteriyle yapılan görüşmeleri kayıt altına alın:",
+          steps: [
+            "Müşteri sayfasına gidin ve Not Ekle seçin",
+            "Görüşme tarihini ve kanalını belirtin: e-posta, telefon",
+            "Konuşulanları özetle yazın",
+            "Sonraki adımı ve takip tarihini ekleyin",
+          ],
+          tip: "Önemli e-postaları kopyalayıp Notion'a yapıştırın, arama özelliğiyle bulabilirsiniz.",
+        },
+        {
+          heading: "Gelir & Hedef Takibi",
+          body: "Aylık gelir hedeflerinizi belirleyin ve gerçekleşeni takip edin:",
+          steps: [
+            "Dashboard sayfasını açın",
+            "Aylık gelir hedefinizi girin",
+            "Onaylanan projeler otomatik olarak gelire eklenir",
+            "Hedef ve gerçekleşme grafiğini inceleyin",
+          ],
+        },
+      ],
+      en: [
+        {
+          heading: "Copying the Template",
+          body: "The Notion CRM template copies to your Notion workspace with one click. A free Notion account is all you need.",
+          steps: [
+            "Open the Notion template link from your email",
+            "Click Duplicate in the top-right corner",
+            "The template is copied to your workspace",
+            "Save it as My CRM and start editing",
+          ],
+          tip: "Access it from anywhere with the Notion Mobile app.",
+        },
+        {
+          heading: "Client Database",
+          body: "Manage all your current and potential clients in a single database.",
+          steps: [
+            "Enter the client name and contact information",
+            "Set the status tag: Prospect, Active, Completed",
+            "Add the industry and budget range",
+            "Note the date of first contact",
+          ],
+        },
+        {
+          heading: "Project & Task Tracking",
+          body: "Track projects and tasks linked to each client:",
+          steps: [
+            "Click Add Project from the client page",
+            "Enter the project name, budget, and deadline",
+            "Add tasks as sub-items",
+            "Update the completion percentage as you progress",
+          ],
+          tip: "Switch the project view to Kanban or Timeline mode.",
+        },
+        {
+          heading: "Proposal & Invoice Tracking",
+          body: "Manage your proposals and invoices from the same place:",
+          steps: [
+            "Select the proposal status: Draft, Sent, Accepted, Rejected",
+            "Enter the proposal amount and date",
+            "Update the status when an invoice is created",
+            "Note the payment date and amount received",
+          ],
+        },
+        {
+          heading: "Communication History",
+          body: "Keep a record of every interaction with each client:",
+          steps: [
+            "Go to the client page and select Add Note",
+            "Specify the meeting date and channel: email, phone, etc.",
+            "Summarize what was discussed",
+            "Add the next step and follow-up date",
+          ],
+          tip: "Copy important emails and paste them into Notion, find them later with search.",
+        },
+        {
+          heading: "Revenue & Goal Tracking",
+          body: "Set monthly income goals and track actuals:",
+          steps: [
+            "Open the Dashboard page",
+            "Enter your monthly income goal",
+            "Confirmed projects are automatically added to revenue",
+            "Review the goal versus actual chart",
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 // ── HTML Template ───────────────────────────────────────────────────────────
