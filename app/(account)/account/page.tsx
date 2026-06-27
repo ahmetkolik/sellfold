@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -73,6 +73,18 @@ function formatDate(iso: string, lang: string) {
 
 
 export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full border-2 border-border border-t-primary animate-spin" />
+      </div>
+    }>
+      <AccountPageInner />
+    </Suspense>
+  );
+}
+
+function AccountPageInner() {
   const { lang } = useLang();
   const isTr = lang === "tr";
   const router = useRouter();
