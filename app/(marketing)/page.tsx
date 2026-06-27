@@ -286,9 +286,6 @@ function Hero({ slides }: { slides: HeroSlide[] }) {
                             style={{ fontSize: 18, margin: 0 }}>
                             {sl.title[lang]}
                           </p>
-                          {sl.price !== null && (
-                            <span className="text-[12.5px] font-bold text-white/90">${sl.price}</span>
-                          )}
                         </div>
                       </>
                     ) : (
@@ -302,9 +299,6 @@ function Hero({ slides }: { slides: HeroSlide[] }) {
                           style={{ fontSize: 20, color: "oklch(20% 0.04 35)", margin: 0 }}>
                           {sl.title[lang]}
                         </p>
-                        {sl.price !== null && (
-                          <span className="text-[12.5px] font-medium" style={{ color: "oklch(45% 0.04 35)" }}>${sl.price}</span>
-                        )}
                       </>
                     )}
 
