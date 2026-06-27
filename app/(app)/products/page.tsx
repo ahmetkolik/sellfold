@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  Plus, Wallet, BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Pencil, Loader2, X, ImagePlus, ArrowUpRight, FileUp,
+  Plus, Wallet, BookOpen, LayoutTemplate, SlidersHorizontal, GraduationCap, Pencil, Loader2, X, ImagePlus, ArrowUpRight, FileUp, Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -335,24 +335,52 @@ function ProductModal({
 
           <div className="space-y-2">
             <Label>{lang === "tr" ? "🇹🇷 Türkçe Dosya (PDF, ZIP…)" : "🇹🇷 Turkish File (PDF, ZIP…)"}</Label>
-            <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
-              <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileTr(e.target.files?.[0] ?? null)} />
-              <FileUp className="h-4 w-4 shrink-0" />
-              <span className="truncate">
-                {digitalFileTr ? digitalFileTr.name : (editProduct?.file_url ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
-              </span>
-            </label>
+            <div className="flex gap-2">
+              <label className="flex flex-1 h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
+                <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileTr(e.target.files?.[0] ?? null)} />
+                <FileUp className="h-4 w-4 shrink-0" />
+                <span className="truncate">
+                  {digitalFileTr ? digitalFileTr.name : (editProduct?.file_url ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
+                </span>
+              </label>
+              {editProduct?.file_url && (
+                <a
+                  href={editProduct.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  title={lang === "tr" ? "Dosyayı indir" : "Download file"}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:border-primary hover:text-primary"
+                >
+                  <Download className="h-4 w-4" />
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label>{lang === "tr" ? "🇬🇧 İngilizce Dosya (PDF, ZIP…)" : "🇬🇧 English File (PDF, ZIP…)"}</Label>
-            <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
-              <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileEn(e.target.files?.[0] ?? null)} />
-              <FileUp className="h-4 w-4 shrink-0" />
-              <span className="truncate">
-                {digitalFileEn ? digitalFileEn.name : (editProduct?.file_url_en ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
-              </span>
-            </label>
+            <div className="flex gap-2">
+              <label className="flex flex-1 h-10 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 text-sm text-muted-foreground transition hover:border-primary hover:text-primary">
+                <input type="file" accept={FILE_ACCEPT} className="hidden" onChange={(e) => setDigitalFileEn(e.target.files?.[0] ?? null)} />
+                <FileUp className="h-4 w-4 shrink-0" />
+                <span className="truncate">
+                  {digitalFileEn ? digitalFileEn.name : (editProduct?.file_url_en ? (lang === "tr" ? "Dosya mevcut — değiştir" : "File exists — replace") : (lang === "tr" ? "Dosya seç" : "Choose file"))}
+                </span>
+              </label>
+              {editProduct?.file_url_en && (
+                <a
+                  href={editProduct.file_url_en}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  title={lang === "tr" ? "Dosyayı indir" : "Download file"}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:border-primary hover:text-primary"
+                >
+                  <Download className="h-4 w-4" />
+                </a>
+              )}
+            </div>
           </div>
 
           <label className="flex cursor-pointer items-center gap-3">

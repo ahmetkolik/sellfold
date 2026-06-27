@@ -23,6 +23,9 @@ interface Product {
   description_en: string | null;
 }
 
+
+
+
 const featureIcons: Record<string, React.ElementType> = {
   store: Store, zap: Zap, "credit-card": CreditCard,
   mail: Mail, users: Users, "ticket-percent": TicketPercent,
@@ -32,13 +35,51 @@ const typeIcon: Record<ProductType, React.ElementType> = {
   preset: SlidersHorizontal, course: GraduationCap,
 };
 
-const HERO_SLIDES = [
-  { id: "h1", emoji: "🗂️", hue: "32",  type: { tr: "Şablon",  en: "Template" }, title: { tr: "Notion ile Hayat Sistemi",     en: "Notion Life OS"                }, sales: { tr: "412 satış", en: "412 sales" }, badge: { tr: "En çok satan", en: "Best seller" } },
-  { id: "h2", emoji: "🎞️", hue: "350", type: { tr: "Preset",   en: "Preset"   }, title: { tr: "Sinematik Lightroom Paketi",   en: "Cinematic Lightroom Pack"      }, sales: { tr: "706 satış", en: "706 sales" }, badge: { tr: "Trend",        en: "Trending"   } },
-  { id: "h3", emoji: "📘", hue: "70",  type: { tr: "E-kitap",  en: "Ebook"    }, title: { tr: "Freelancer'ın El Kitabı",      en: "The Freelancer's Handbook"     }, sales: { tr: "528 satış", en: "528 sales" }, badge: { tr: "Çok satılan",  en: "Top rated"  } },
-  { id: "h4", emoji: "🎓", hue: "152", type: { tr: "Kurs",     en: "Course"   }, title: { tr: "30 Günde Topluluk Kur",        en: "Build a Community in 30 Days"  }, sales: { tr: "134 satış", en: "134 sales" }, badge: { tr: "Yeni",         en: "New"        } },
-  { id: "h5", emoji: "🎠", hue: "300", type: { tr: "Şablon",   en: "Template" }, title: { tr: "Instagram Carousel Şablonları", en: "Instagram Carousel Templates" }, sales: { tr: "389 satış", en: "389 sales" }, badge: { tr: "Popüler",      en: "Popular"    } },
+const STATIC_HERO_SLIDES = [
+  { id: "h1", emoji: "🗂️", hue: "32",  type: { tr: "Şablon",  en: "Template" }, title: { tr: "Notion ile Hayat Sistemi",     en: "Notion Life OS"                }, price: null, badge: { tr: "En çok satan", en: "Best seller" }, image: null },
+  { id: "h2", emoji: "🎞️", hue: "350", type: { tr: "Preset",   en: "Preset"   }, title: { tr: "Sinematik Lightroom Paketi",   en: "Cinematic Lightroom Pack"      }, price: null, badge: { tr: "Trend",        en: "Trending"   }, image: null },
+  { id: "h3", emoji: "📘", hue: "70",  type: { tr: "E-kitap",  en: "Ebook"    }, title: { tr: "Freelancer'ın El Kitabı",      en: "The Freelancer's Handbook"     }, price: null, badge: { tr: "Çok satılan",  en: "Top rated"  }, image: null },
+  { id: "h4", emoji: "🎓", hue: "152", type: { tr: "Kurs",     en: "Course"   }, title: { tr: "30 Günde Topluluk Kur",        en: "Build a Community in 30 Days"  }, price: null, badge: { tr: "Yeni",         en: "New"        }, image: null },
+  { id: "h5", emoji: "🎠", hue: "300", type: { tr: "Şablon",   en: "Template" }, title: { tr: "Instagram Carousel Şablonları", en: "Instagram Carousel Templates" }, price: null, badge: { tr: "Popüler",      en: "Popular"    }, image: null },
 ];
+
+const TYPE_LABELS: Record<ProductType, { tr: string; en: string }> = {
+  ebook:    { tr: "E-kitap",  en: "Ebook"    },
+  template: { tr: "Şablon",   en: "Template" },
+  preset:   { tr: "Preset",   en: "Preset"   },
+  course:   { tr: "Kurs",     en: "Course"   },
+};
+
+const BADGES = [
+  { tr: "Trend",        en: "Trending"    },
+  { tr: "Popüler",      en: "Popular"     },
+  { tr: "Yeni",         en: "New"         },
+  { tr: "Çok satılan",  en: "Top rated"   },
+  { tr: "En çok satan", en: "Best seller" },
+];
+
+type HeroSlide = {
+  id: string; emoji: string; hue: string;
+  type: { tr: string; en: string };
+  title: { tr: string; en: string };
+  price: number | null;
+  badge: { tr: string; en: string };
+  image: string | null;
+};
+
+function buildHeroSlides(products: Product[]): HeroSlide[] {
+  if (products.length === 0) return STATIC_HERO_SLIDES;
+  return products.slice(0, 5).map((p, i) => ({
+    id: p.id,
+    emoji: p.emoji,
+    hue: p.hue,
+    type: TYPE_LABELS[p.type] ?? { tr: p.type, en: p.type },
+    title: { tr: p.title, en: p.title },
+    price: p.price,
+    badge: BADGES[i % BADGES.length],
+    image: p.category_image_url,
+  }));
+}
 
 /* ── Navbar ─────────────────────────────────────────────────────────────── */
 function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -141,15 +182,15 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
-function Hero() {
+function Hero({ slides }: { slides: HeroSlide[] }) {
   const { t, lang } = useLang();
   const isTr = lang === "tr";
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setSlide(s => (s + 1) % HERO_SLIDES.length), 3200);
+    const id = setInterval(() => setSlide(s => (s + 1) % slides.length), 3200);
     return () => clearInterval(id);
-  }, []);
+  }, [slides.length]);
 
   return (
     <section className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, oklch(98% 0.02 50) 0%, oklch(95% 0.06 38) 50%, oklch(94% 0.07 350) 100%)" }}>
@@ -222,26 +263,50 @@ function Hero() {
               {/* Card shell */}
               <div className="relative overflow-hidden rounded-3xl border border-border"
                 style={{ aspectRatio: "4/3", background: "oklch(99.5% 0.005 50)", boxShadow: "0 24px 60px oklch(66% 0.18 32 / .18), 0 4px 18px rgba(0,0,0,.1)" }}>
-                {HERO_SLIDES.map((sl, i) => (
+                {slides.map((sl, i) => (
                   <div key={sl.id}
                     className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 py-7"
                     style={{
-                      background: `linear-gradient(145deg, oklch(95% 0.07 ${sl.hue}) 0%, oklch(82% 0.18 ${sl.hue}) 100%)`,
+                      background: sl.image ? undefined : `linear-gradient(145deg, oklch(95% 0.07 ${sl.hue}) 0%, oklch(82% 0.18 ${sl.hue}) 100%)`,
                       opacity: i === slide ? 1 : 0,
                       transform: i === slide ? "scale(1) translateY(0)" : "scale(.97) translateY(8px)",
                       transition: "opacity .7s ease, transform .7s ease",
                       pointerEvents: i === slide ? "auto" : "none",
                     }}>
-                    <span className="text-7xl" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,.12))" }}>{sl.emoji}</span>
-                    <span className="rounded-full px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[.06em]"
-                      style={{ background: "rgba(255,255,255,.82)", backdropFilter: "blur(8px)", color: "oklch(35% 0.04 35)" }}>
-                      {sl.type[lang]}
-                    </span>
-                    <p className="font-display font-semibold text-center leading-[1.25]"
-                      style={{ fontSize: 20, color: "oklch(20% 0.04 35)", margin: 0 }}>
-                      {sl.title[lang]}
-                    </p>
-                    <span className="text-[12.5px] font-medium" style={{ color: "oklch(45% 0.04 35)" }}>{sl.sales[lang]}</span>
+                    {sl.image ? (
+                      <>
+                        <img src={sl.image} alt={sl.title[lang]} className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 55%, transparent 100%)" }} />
+                        <div className="relative flex flex-col items-center gap-2 mt-auto w-full px-2 pb-2">
+                          <span className="rounded-full px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[.06em]"
+                            style={{ background: "rgba(255,255,255,.82)", backdropFilter: "blur(8px)", color: "oklch(35% 0.04 35)" }}>
+                            {sl.type[lang]}
+                          </span>
+                          <p className="font-display font-semibold text-center leading-[1.25] text-white drop-shadow"
+                            style={{ fontSize: 18, margin: 0 }}>
+                            {sl.title[lang]}
+                          </p>
+                          {sl.price !== null && (
+                            <span className="text-[12.5px] font-bold text-white/90">${sl.price}</span>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-7xl" style={{ filter: "drop-shadow(0 8px 18px rgba(0,0,0,.12))" }}>{sl.emoji}</span>
+                        <span className="rounded-full px-3 py-1 font-mono text-[11px] font-medium uppercase tracking-[.06em]"
+                          style={{ background: "rgba(255,255,255,.82)", backdropFilter: "blur(8px)", color: "oklch(35% 0.04 35)" }}>
+                          {sl.type[lang]}
+                        </span>
+                        <p className="font-display font-semibold text-center leading-[1.25]"
+                          style={{ fontSize: 20, color: "oklch(20% 0.04 35)", margin: 0 }}>
+                          {sl.title[lang]}
+                        </p>
+                        {sl.price !== null && (
+                          <span className="text-[12.5px] font-medium" style={{ color: "oklch(45% 0.04 35)" }}>${sl.price}</span>
+                        )}
+                      </>
+                    )}
 
                     {/* Badge */}
                     <div className="absolute top-3.5 right-3.5 rounded-full px-2.5 py-1 text-[11px] font-bold text-white"
@@ -250,20 +315,22 @@ function Hero() {
                     </div>
 
                     {/* Free chip */}
-                    <div className="absolute bottom-3.5 left-3.5 flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5"
-                      style={{ background: "rgba(255,255,255,.88)", backdropFilter: "blur(8px)" }}>
-                      <Check className="h-3 w-3" style={{ color: "oklch(66% 0.14 152)" }} />
-                      <span className="text-[11.5px] font-bold" style={{ color: "oklch(30% 0.04 35)" }}>
-                        {isTr ? "Starter ile ücretsiz" : "Free on Starter"}
-                      </span>
-                    </div>
+                    {!sl.image && (
+                      <div className="absolute bottom-3.5 left-3.5 flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5"
+                        style={{ background: "rgba(255,255,255,.88)", backdropFilter: "blur(8px)" }}>
+                        <Check className="h-3 w-3" style={{ color: "oklch(66% 0.14 152)" }} />
+                        <span className="text-[11.5px] font-bold" style={{ color: "oklch(30% 0.04 35)" }}>
+                          {isTr ? "Starter ile ücretsiz" : "Free on Starter"}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
               {/* Dots */}
               <div className="flex items-center justify-center gap-1.5 mt-3.5">
-                {HERO_SLIDES.map((_, i) => (
+                {slides.map((_, i) => (
                   <button key={i} onClick={() => setSlide(i)}
                     className="border-none cursor-pointer rounded-full transition-all duration-300"
                     style={{
@@ -674,12 +741,17 @@ function Footer() {
 export default function MarketingPage() {
   const { lang } = useLang();
   const [products, setProducts] = useState<Product[]>([]);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(STATIC_HERO_SLIDES);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.from("products").select("id,title,type,price,emoji,hue,category_image_url,description,description_en").eq("live", true).limit(6)
-      .then(({ data }) => setProducts((data ?? []) as Product[]));
+      .then(({ data }) => {
+        const list = (data ?? []) as Product[];
+        setProducts(list);
+        setHeroSlides(buildHeroSlides(list));
+      });
     supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
 
     let sid = sessionStorage.getItem("_dsid");
@@ -694,7 +766,7 @@ export default function MarketingPage() {
   return (
     <div className="min-h-dvh">
       <Navbar isLoggedIn={isLoggedIn} />
-      <Hero />
+      <Hero slides={heroSlides} />
       <Stats />
       <Features />
       <Products products={products} lang={lang} />
