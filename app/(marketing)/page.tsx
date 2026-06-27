@@ -505,9 +505,37 @@ function Products({ products, lang }: { products: Product[]; lang: "tr" | "en" }
 function Pricing() {
   const { t, lang } = useLang();
   const isTr = lang === "tr";
-  const planLinks: Record<string, string> = {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [upgradeLoading, setUpgradeLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+  }, []);
+
+  async function handlePlanCheckout(planId: string) {
+    setUpgradeLoading(planId);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planId }),
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+      else setUpgradeLoading(null);
+    } catch {
+      setUpgradeLoading(null);
+    }
+  }
+
+  const tierPlanId: Record<string, string> = {
+    Starter: "starter", Creator: "creator", Studio: "studio",
+  };
+  const guestLinks: Record<string, string> = {
     Starter: "/signup", Creator: "/signup?plan=creator", Studio: "/signup?plan=studio",
   };
+
   return (
     <section id="pricing" className="py-20 lg:py-28">
       <div className="mx-auto max-w-5xl px-4 lg:px-8">
@@ -518,7 +546,11 @@ function Pricing() {
           </h2>
         </div>
         <div className="grid gap-5 lg:grid-cols-3 lg:items-stretch">
-          {appConfig.marketing.pricing.map((tier) => (
+          {appConfig.marketing.pricing.map((tier) => {
+            const planId = tierPlanId[tier.name] ?? "starter";
+            const isPaid = planId !== "starter";
+            const isLoading = upgradeLoading === planId;
+            return (
             <div key={tier.name}
               className="relative flex flex-col rounded-[22px] border bg-card p-7"
               style={{
@@ -551,16 +583,36 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link href={planLinks[tier.name] ?? "/signup"}
-                className="mt-5 flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={tier.featured
-                  ? { background: "oklch(66% 0.18 32)", boxShadow: "0 6px 18px oklch(66% 0.18 32 / .28)" }
-                  : { background: "var(--color-sidebar)" }}>
-                {t(tier.cta)}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+              {isLoggedIn && isPaid ? (
+                <button
+                  onClick={() => handlePlanCheckout(planId)}
+                  disabled={!!upgradeLoading}
+                  className="mt-5 flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  style={tier.featured
+                    ? { background: "oklch(66% 0.18 32)", boxShadow: "0 6px 18px oklch(66% 0.18 32 / .28)" }
+                    : { background: "var(--color-sidebar)" }}>
+                  {isLoading
+                    ? <><Zap className="h-3.5 w-3.5 animate-pulse" />{isTr ? "Yönlendiriliyor..." : "Redirecting..."}</>
+                    : <>{t(tier.cta)}<ArrowRight className="h-3.5 w-3.5" /></>}
+                </button>
+              ) : isLoggedIn && !isPaid ? (
+                <Link href="/account"
+                  className="mt-5 flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  style={{ background: "var(--color-sidebar)" }}>
+                  {isTr ? "Hesabıma git" : "Go to my account"} <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : (
+                <Link href={guestLinks[tier.name] ?? "/signup"}
+                  className="mt-5 flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  style={tier.featured
+                    ? { background: "oklch(66% 0.18 32)", boxShadow: "0 6px 18px oklch(66% 0.18 32 / .28)" }
+                    : { background: "var(--color-sidebar)" }}>
+                  {t(tier.cta)}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </section>

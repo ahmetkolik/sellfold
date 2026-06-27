@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
 
+const ADMIN_EMAILS = ["kolikahmet@gmail.com", "info@kolikshop.com"];
+
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -10,9 +12,9 @@ export async function POST(req: Request) {
 
   const supabase = await createClient();
 
-  // Check logged-in user's quota
+  // Check logged-in user's quota (admins bypass quota checks)
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
+  if (user && !ADMIN_EMAILS.includes(user.email ?? "")) {
     const { data: profile } = await supabase.from("profiles").select("plan").eq("id", user.id).single();
     const plan = profile?.plan ?? "starter";
 
