@@ -44,3 +44,6 @@ next-env.d.ts
 
 # Mobile test screenshots
 mobile-*.png
+
+# PDF generation output
+.generated-pdfs/
