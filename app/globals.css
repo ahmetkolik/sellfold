@@ -188,6 +188,25 @@ body {
 .hl { background-image: linear-gradient(transparent 60%, color-mix(in oklch, var(--color-serif) 42%, transparent) 60%); background-repeat: no-repeat; }
 .hl-primary { background-image: linear-gradient(transparent 60%, color-mix(in oklch, var(--color-primary) 30%, transparent) 60%); background-repeat: no-repeat; }
 
+/* CTA band — animated orbs and floating chips */
+@keyframes ctaOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-20px) scale(1.08); } 66% { transform: translate(-14px,18px) scale(.94); } }
+@keyframes ctaOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(-24px,16px) scale(1.06); } 66% { transform: translate(20px,-22px) scale(.96); } }
+@keyframes ctaOrb3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(10px,-28px); } }
+@keyframes ctaFloat1 { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+@keyframes ctaFloat2 { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(10px) rotate(-3deg); } }
+@keyframes ctaFloat3 { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+.cta-orb-1 { animation: ctaOrb1 14s ease-in-out infinite; }
+.cta-orb-2 { animation: ctaOrb2 18s ease-in-out infinite; }
+.cta-orb-3 { animation: ctaOrb3 11s ease-in-out infinite; }
+.cta-float-1 { animation: ctaFloat1 7s ease-in-out infinite; }
+.cta-float-2 { animation: ctaFloat2 9s ease-in-out infinite; }
+.cta-float-3 { animation: ctaFloat3 8s ease-in-out infinite; }
+.cta-float-4 { animation: ctaFloat1 10s ease-in-out infinite reverse; }
+
+/* Hero carousel slide transition */
+@keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
 @media (prefers-reduced-motion: reduce) {
-  .rise, .drift, .pulse-dot, .marquee, .floaty, .animate-float-up { animation: none; }
+  .rise, .drift, .pulse-dot, .marquee, .floaty, .animate-float-up,
+  .cta-orb-1, .cta-orb-2, .cta-orb-3, .cta-float-1, .cta-float-2, .cta-float-3, .cta-float-4 { animation: none; }
 }
