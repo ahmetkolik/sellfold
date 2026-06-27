@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const ADMIN_EMAILS = ["kolikahmet@gmail.com", "info@kolikshop.com"];
+const ADMIN_PREFIXES = ["/dashboard", "/products", "/sales", "/customers", "/settings"];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({
@@ -37,7 +38,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (!ADMIN_EMAILS.includes(user.email ?? "")) {
+  const pathname = request.nextUrl.pathname;
+  const isAdminRoute = ADMIN_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+
+  if (isAdminRoute && !ADMIN_EMAILS.includes(user.email ?? "")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -51,5 +57,7 @@ export const config = {
     "/sales/:path*",
     "/customers/:path*",
     "/settings/:path*",
+    "/account",
+    "/account/:path*",
   ],
 };

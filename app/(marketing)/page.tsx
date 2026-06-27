@@ -14,6 +14,8 @@ import { LanguageToggle } from "@/components/ui/language-toggle";
 import appConfig from "@/app.config";
 import { createClient } from "@/lib/supabase/client";
 
+const ADMIN_EMAILS = ["kolikahmet@gmail.com", "info@kolikshop.com"];
+
 type ProductType = "ebook" | "template" | "preset" | "course";
 interface Product {
   id: string; title: string; type: ProductType;
@@ -82,7 +84,7 @@ function buildHeroSlides(products: Product[]): HeroSlide[] {
 }
 
 /* ── Navbar ─────────────────────────────────────────────────────────────── */
-function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
+function Navbar({ isLoggedIn, isAdmin }: { isLoggedIn: boolean; isAdmin: boolean }) {
   const { lang } = useLang();
   const [open, setOpen] = useState(false);
 
@@ -109,26 +111,25 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="flex items-center gap-2">
           <LanguageToggle className="hidden sm:flex" />
           {isLoggedIn ? (
-            <Link href="/dashboard"
-              className="hidden md:inline-flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-sm font-semibold text-sidebar-foreground transition-opacity hover:opacity-90"
-              style={{ background: "var(--color-sidebar)" }}>
-              <LayoutDashboard className="h-3.5 w-3.5" />
-              {lang === "tr" ? "Panel" : "Dashboard"}
-            </Link>
+            <div className="hidden md:flex items-center gap-2">
+              {isAdmin && (
+                <Link href="/dashboard"
+                  className="inline-flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-sm font-semibold text-sidebar-foreground transition-opacity hover:opacity-90"
+                  style={{ background: "var(--color-sidebar)" }}>
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  {lang === "tr" ? "Panel" : "Dashboard"}
+                </Link>
+              )}
+              <Link href="/account"
+                className="rounded-[9px] px-3.5 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                {lang === "tr" ? "Hesabım" : "My Account"}
+              </Link>
+            </div>
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Link href="/login"
                 className="rounded-[9px] px-3.5 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
                 {lang === "tr" ? "Giriş yap" : "Sign in"}
-              </Link>
-              <Link href="/dashboard"
-                className="inline-flex items-center gap-1.5 rounded-[9px] px-3.5 py-2 text-sm font-semibold text-sidebar-foreground transition-opacity hover:opacity-90"
-                style={{ background: "var(--color-sidebar)" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                  <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg>
-                {lang === "tr" ? "Panel" : "Dashboard"}
               </Link>
               <Link href="/signup"
                 className="rounded-full px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -154,12 +155,20 @@ function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
           ))}
           <div className="pt-3 border-t border-border mt-2 space-y-2">
             {isLoggedIn ? (
-              <Link href="/dashboard" onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-sidebar-foreground"
-                style={{ background: "var(--color-sidebar)" }}>
-                <LayoutDashboard className="h-4 w-4" />
-                {lang === "tr" ? "Panel" : "Dashboard"}
-              </Link>
+              <>
+                {isAdmin && (
+                  <Link href="/dashboard" onClick={() => setOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-sidebar-foreground"
+                    style={{ background: "var(--color-sidebar)" }}>
+                    <LayoutDashboard className="h-4 w-4" />
+                    {lang === "tr" ? "Panel" : "Dashboard"}
+                  </Link>
+                )}
+                <Link href="/account" onClick={() => setOpen(false)}
+                  className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted">
+                  {lang === "tr" ? "Hesabım" : "My Account"}
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/login" onClick={() => setOpen(false)}
@@ -263,9 +272,13 @@ function Hero({ slides }: { slides: HeroSlide[] }) {
               {/* Card shell */}
               <div className="relative overflow-hidden rounded-3xl border border-border"
                 style={{ aspectRatio: "4/3", background: "oklch(99.5% 0.005 50)", boxShadow: "0 24px 60px oklch(66% 0.18 32 / .18), 0 4px 18px rgba(0,0,0,.1)" }}>
-                {slides.map((sl, i) => (
-                  <div key={sl.id}
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 py-7"
+                {slides.map((sl, i) => {
+                  const isProduct = !sl.id.startsWith("h");
+                  const Wrapper = isProduct ? Link : "div";
+                  const wrapperProps = isProduct ? { href: `/p/${sl.id}` } : {};
+                  return (
+                  <Wrapper key={sl.id} {...(wrapperProps as any)}
+                    className={`absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 py-7${isProduct ? " cursor-pointer" : ""}`}
                     style={{
                       background: sl.image ? undefined : `linear-gradient(145deg, oklch(95% 0.07 ${sl.hue}) 0%, oklch(82% 0.18 ${sl.hue}) 100%)`,
                       opacity: i === slide ? 1 : 0,
@@ -318,8 +331,9 @@ function Hero({ slides }: { slides: HeroSlide[] }) {
                         </span>
                       </div>
                     )}
-                  </div>
-                ))}
+                  </Wrapper>
+                );
+                })}
               </div>
 
               {/* Dots */}
@@ -737,6 +751,7 @@ export default function MarketingPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(STATIC_HERO_SLIDES);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -746,7 +761,10 @@ export default function MarketingPage() {
         setProducts(list);
         setHeroSlides(buildHeroSlides(list));
       });
-    supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+      setIsAdmin(!!user && ADMIN_EMAILS.includes(user.email ?? ""));
+    });
 
     let sid = sessionStorage.getItem("_dsid");
     if (!sid) { sid = Math.random().toString(36).slice(2); sessionStorage.setItem("_dsid", sid); }
@@ -759,7 +777,7 @@ export default function MarketingPage() {
 
   return (
     <div className="min-h-dvh">
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
       <Hero slides={heroSlides} />
       <Stats />
       <Features />
