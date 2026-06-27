@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import appConfig from "@/app.config";
 import { useLang } from "@/components/i18n/language-provider";
@@ -12,9 +12,12 @@ import { Input, Label } from "@/components/ui/input";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { createClient } from "@/lib/supabase/client";
 
+const ADMIN_EMAILS = ["kolikahmet@gmail.com", "info@kolikshop.com"];
+
 export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
   const { ui, t, lang } = useLang();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"google" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +72,11 @@ export function AuthScreen({ mode }: { mode: "login" | "signup" }) {
       if (err) { setError(err.message); setLoading(false); return; }
     }
 
-    router.push("/dashboard");
+    const next = searchParams.get("next");
+    const { data: { user: loggedInUser } } = await supabase.auth.getUser();
+    const isAdmin = ADMIN_EMAILS.includes(loggedInUser?.email ?? "");
+    const destination = next || (isAdmin ? "/dashboard" : "/account");
+    router.push(destination);
     router.refresh();
   }
 
