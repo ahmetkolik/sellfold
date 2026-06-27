@@ -25,8 +25,17 @@ export async function POST() {
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const stripe = getStripe();
+  const customerId = profile.stripe_customer_id as string;
+
+  try {
+    await stripe.customers.retrieve(customerId);
+  } catch {
+    await supabase.from("profiles").update({ stripe_customer_id: null }).eq("id", user.id);
+    return NextResponse.json({ error: "No active subscription" }, { status: 400 });
+  }
+
   const session = await stripe.billingPortal.sessions.create({
-    customer: profile.stripe_customer_id as string,
+    customer: customerId,
     return_url: `${baseUrl}/account`,
   });
 

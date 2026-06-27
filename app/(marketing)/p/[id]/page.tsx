@@ -185,7 +185,7 @@ export default function ProductPage() {
         });
         const data = await res.json();
         if (data.error === "quota_exceeded") {
-          window.location.href = "/settings#billing";
+          window.location.href = "/account";
           return;
         }
         if (data.error === "already_claimed") {
@@ -215,7 +215,7 @@ export default function ProductPage() {
       });
       const { url, error } = await res.json();
       if (error === "quota_exceeded") {
-        window.location.href = "/settings#billing";
+        window.location.href = "/account";
         return;
       }
       if (error || !url) { alert(lang === "tr" ? "Bir hata oluştu." : "An error occurred."); setBuying(false); return; }

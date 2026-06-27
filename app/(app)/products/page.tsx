@@ -420,7 +420,7 @@ function ProductModal({
   );
 }
 
-const STARTER_LIMIT = Infinity;
+const STARTER_LIMIT = 3;
 
 export default function ProductsPage() {
   const { lang, t } = useLang();
