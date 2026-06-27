@@ -30,6 +30,16 @@ export async function POST(req: Request) {
 
   const stripe = getStripe();
   let customerId = profile?.stripe_customer_id as string | undefined;
+
+  if (customerId) {
+    try {
+      await stripe.customers.retrieve(customerId);
+    } catch {
+      customerId = undefined;
+      await supabase.from("profiles").update({ stripe_customer_id: null }).eq("id", user.id);
+    }
+  }
+
   if (!customerId) {
     const customer = await stripe.customers.create({ email: user.email });
     customerId = customer.id;
